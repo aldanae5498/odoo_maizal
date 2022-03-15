@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="project_requerimiento_form" model="ir.ui.view">
+        <field name="name">Requerimientos</field>
+        <field name="model">project.requerimiento</field>
+        <field name="arch" type="xml">
+            <form string="Requerimientos">
+                <sheet>             
+                    <div class="oe_title pr-0">
+                        <h1 class="d-flex flex-row justify-content-between">
+                            <field name="titulo" class="o_task_name text-truncate" placeholder="Título del Requerimiento..." default_focus="1" />
+                            <field name="id" string="Código" class="ml-auto" readonly="1" />
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="fecha_limite"/>
+                        <field name="estatus"/>
+                        <field name="task_id"/>
+                    </group>
+                    
+                    <br/>
+                    <h2>Interesados:</h2>
+                    
+                    <group>
+                        <field name="director_id"/>
+                        <field name="lider_id"/>
+                        <field name="gestor_id"/>
+                    </group>     
+                    <notebook>
+                        <page string="Aceptación">
+                            <group>
+                                <field name="fecha_inicial"/>
+                                <button name="aceptar_requerimiento" string="Aceptar requierimiento" type="action" class="oe_highlight oe_read_only"/>
+                            </group>
+                        </page>
+                        <page string="Descripción">
+                            <group>
+                                <field name="descripcion"/>
+                            </group>
+                        </page>    
+                        <page string="Documento">
+                            <group>
+                                <field name="attachment_id"/>
+                                <field name="descripcion_documento"/>
+                            </group>
+                        </page>                                                
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread" options="{'post_refresh': 'recipients'}"/>
+                </div>                
+            </form>
+        </field>
+    </record>    
+
+
+</odoo>
