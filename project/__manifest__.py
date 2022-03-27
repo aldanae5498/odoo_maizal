@@ -38,6 +38,8 @@
         'data/digest_data.xml',
         'data/project_mail_template_data.xml',
         'data/project_data.xml',
+        # Requerimiento - Email Template:
+        'data/et_nuevo_requerimiento.xml',        
     ],
     'qweb': ['static/src/xml/project.xml'],
     'demo': ['data/project_demo.xml'],
