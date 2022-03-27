@@ -11,11 +11,13 @@ class Requerimiento(models.Model):
     _name = "project.requerimiento"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = "Requerimiento"
-    _order = "titulo"
-    _rec_name = "titulo"
+    _order = "name"
+    _rec_name = "name"
 
     name = fields.Char(string='Código de Requerimiento', required=True, copy=False, readonly=True, states={'borrador': [('readonly', False)]}, index=True, default=lambda self: _('Nuevo'))
     titulo = fields.Char("Título", index=True, required=True, track_visibility='onchange')
+    project_id = fields.Many2one('project.project', string='Proyecto', required=True)
+    fecha_inicial = fields.Datetime("Fecha Inicial", required=True, index=True)
     fecha_limite = fields.Datetime("Fecha Límite", required=True, index=True)
     state = fields.Selection(
         [
@@ -25,17 +27,14 @@ class Requerimiento(models.Model):
             ('cancelado', 'Cancelado'),
         ],
         string = 'Estado',
+        default = 'borrador',
         tracking = True
     )
-    project_id = fields.Many2one('project.project', string='Proyecto')
 
     # Interesados:
     director_id = fields.Many2one('res.partner', string='Director')
     lider_id = fields.Many2one('res.partner', string='Líder')
     gestor_id = fields.Many2one('res.partner', string='Gestor') 
-
-    # Aceptación:
-    fecha_inicial = fields.Datetime("Fecha Inicial", required=True, index=True)
 
     # Descripción:
     descripcion = fields.Html("Descripción")
@@ -86,7 +85,7 @@ class Requerimiento(models.Model):
     # Botón que envía correo:
     @api.multi
     def btn_send_email(self):
-        template_obj = self.env['mail.template'].search([('name','=','Email Template - Nuevo Requerimiento')], limit=1)
+        template_obj = self.env['mail.template'].sudo().search([('name','=','Email Template - Nuevo Requerimiento')], limit=1)
         if template_obj:
             
             # receipt_list = ['abc@gmail.com','xyz@yahoo.com']
