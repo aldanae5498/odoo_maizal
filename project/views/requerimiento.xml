@@ -1,22 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- ==================== Listado / Tree ====================  -->
+    <record id="project_requerimiento_tree" model="ir.ui.view">
+        <field name="name">project.requerimiento.tree</field>
+        <field name="model">project.requerimiento</field>
+        <field name="arch" type="xml">
+            <tree>          
+                <field name="name"/>
+                <field name="titulo"/>
+                <field name="project_id"/>
+                <field name="fecha_limite"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    
 
+    <!-- ==================== Formulario ==================== -->
     <record id="project_requerimiento_form" model="ir.ui.view">
         <field name="name">Requerimientos</field>
         <field name="model">project.requerimiento</field>
         <field name="arch" type="xml">
             <form string="Requerimientos">
+                <header>
+                    <button name="btn_send_email" string="Enviar correo" type="action" class="oe_highlight oe_read_only"/>
+                    <button id="button_confirmar" name="action_confirmar" string="Confirmar" class="btn-primary" states="borrador"
+                        confirm="¿Estás seguro(a) que desea confirmar?" 
+                        type="object"
+                    />
+
+                    <button id="button_hecho" name="action_hecho" string="Marcar como hecho" class="btn-primary" states="confirmado"
+                        type="object"
+                    />
+
+                    <button id="button_borrador" name="action_borrador" string="Establecer a borrador" class="btn-primary" states="cancelado"
+                        type="object"
+                    />
+
+                    <button id="button_cancelar" name="action_cancelar" string="Cancelar" class="btn-primary" states="borrador,hecho,confirmado"
+                        confirm="¿Estás seguro(a) que desea cancelar?"
+                        type="object"
+                    />                                                                
+
+                    <field name="state" widget="statusbar" statusbar_visible="borrador,hecho,confirmado"/>
+                </header>
                 <sheet>             
+                    <div class="oe_button_box" name="button_box" groups="base.group_user">
+                        <button class="oe_stat_button" name="attachment_tree_view" type="object" icon="fa-files-o">
+                            <field string="Documentos" name="doc_count" widget="statinfo"/>
+                        </button>
+                    </div>                
+                    <div class="oe_title">    
+                        <h1>
+                            <!-- <span>Código</span>: --> 
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>                
                     <div class="oe_title pr-0">
                         <h1 class="d-flex flex-row justify-content-between">
                             <field name="titulo" class="o_task_name text-truncate" placeholder="Título del Requerimiento..." default_focus="1" />
-                            <field name="id" string="Código" class="ml-auto" readonly="1" />
                         </h1>
                     </div>
                     <group>
+                        <field name="fecha_inicial"/>
                         <field name="fecha_limite"/>
-                        <field name="estatus"/>
-                        <field name="task_id"/>
+                        <field name="project_id"/>
                     </group>
                     
                     <br/>
@@ -28,23 +76,10 @@
                         <field name="gestor_id"/>
                     </group>     
                     <notebook>
-                        <page string="Aceptación">
-                            <group>
-                                <field name="fecha_inicial"/>
-                                <button name="aceptar_requerimiento" string="Aceptar requierimiento" type="action" class="oe_highlight oe_read_only"/>
-                            </group>
-                        </page>
                         <page string="Descripción">
-                            <group>
-                                <field name="descripcion"/>
-                            </group>
-                        </page>    
-                        <page string="Documento">
-                            <group>
-                                <field name="attachment_id"/>
-                                <field name="descripcion_documento"/>
-                            </group>
-                        </page>                                                
+                            <field name="descripcion" type="html"/>
+                            <div class="oe_clear"/>
+                        </page>                                                  
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">
