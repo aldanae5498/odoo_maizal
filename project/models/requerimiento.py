@@ -22,9 +22,9 @@ class Requerimiento(models.Model):
     state = fields.Selection(
         [
             ('borrador', 'Borrador'),
-            ('confirmado', 'Confirmado'),
-            ('hecho', 'Hecho'),
-            ('cancelado', 'Cancelado'),
+            ('confirmado', 'Aceptado'),
+            ('hecho', 'Validado'),
+            ('cancelado', 'Devuelto'),
         ],
         string = 'Estado',
         default = 'borrador',
