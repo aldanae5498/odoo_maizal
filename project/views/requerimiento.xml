@@ -25,12 +25,12 @@
             <form string="Requerimientos">
                 <header>
                     <button name="btn_send_email" string="Enviar correo" type="action" class="oe_highlight oe_edit_only"/>
-                    <button id="button_confirmar" name="action_confirmar" string="Confirmar" class="btn-primary" states="borrador"
-                        confirm="¿Estás seguro(a) que desea confirmar?" 
+                    <button id="button_confirmar" name="action_confirmar" string="Aceptar" class="btn-primary" states="borrador"
+                        confirm="¿Estás seguro(a) que desea aceptar el requerimiento?" 
                         type="object"
                     />
 
-                    <button id="button_hecho" name="action_hecho" string="Marcar como hecho" class="btn-primary" states="confirmado"
+                    <button id="button_hecho" name="action_hecho" string="Validar" class="btn-primary" states="confirmado"
                         type="object"
                     />
 
@@ -38,14 +38,19 @@
                         type="object"
                     />
 
-                    <button id="button_cancelar" name="action_cancelar" string="Cancelar" class="btn-primary" states="borrador,hecho,confirmado"
-                        confirm="¿Estás seguro(a) que desea cancelar?"
+                    <button id="button_cancelar" name="action_cancelar" string="Devolver" class="btn-primary" states="borrador,hecho,confirmado"
+                        confirm="¿Estás seguro(a) que desea devolver el requerimiento?"
                         type="object"
                     />                                                                
 
                     <field name="state" widget="statusbar" statusbar_visible="borrador,hecho,confirmado"/>
                 </header>
-                <sheet>                       
+                <sheet>                    
+                    <div class="oe_button_box">
+                        <button  class="oe_stat_button" name="attachment_tree_view" type="object" icon="fa-files-o">
+                            <field string="Documentos" name="doc_count" widget="statinfo"/>
+                        </button>
+                    </div>                   
                     <div class="oe_title">    
                         <h1>
                             <!-- <span>Código</span>: --> 
