@@ -16,7 +16,15 @@ class Requerimiento(models.Model):
 
     name = fields.Char(string='Código de Requerimiento', required=True, copy=False, readonly=True, states={'borrador': [('readonly', False)]}, index=True, default=lambda self: _('Nuevo'))
     titulo = fields.Char("Título", index=True, required=True, track_visibility='onchange')
-    project_id = fields.Many2one('project.project', string='Proyecto', required=True)
+    
+    project_id = fields.Many2one(
+        'project.project', 
+        string='Proyecto', 
+        required=True,default=lambda self: self.env.context.get('default_project_id'), 
+        index=True, track_visibility='onchange',
+        change_default=True
+    )
+
     fecha_inicial = fields.Datetime("Fecha Inicial", required=True, index=True)
     fecha_limite = fields.Datetime("Fecha Límite", required=True, index=True)
     state = fields.Selection(
@@ -65,6 +73,7 @@ class Requerimiento(models.Model):
     # Secuencia:
     @api.model
     def create(self, vals):
+        self.env.user.notify_success(message='Requerimiento registrado exitosamente')
         if vals.get('name', _('Nuevo')) == _('Nuevo'):
             vals['name'] = self.env['ir.sequence'].next_by_code('project.requerimiento') or _('Nuevo')
         res = super(Requerimiento, self).create(vals)
@@ -110,4 +119,66 @@ class Requerimiento(models.Model):
             'email_cc':';'.join(map(lambda x: x, email_cc)),
             'email_from': 'aldanae5498@gmail.com',
             }
-            create_and_send_email = self.env['mail.mail'].create(mail_values).send()    
+            create_and_send_email = self.env['mail.mail'].create(mail_values).send()      
+
+    @api.model
+    def _get_default_partner(self):
+        if 'default_project_id' in self.env.context:
+            default_project_id = self.env['project.project'].browse(self.env.context['default_project_id'])
+            return default_project_id.exists().partner_id
+
+    def _get_default_stage_id(self):
+        """ Gives default stage_id """
+        project_id = self.env.context.get('default_project_id')
+        if not project_id:
+            return False
+        return self.stage_find(project_id, [('fold', '=', False)])
+
+    @api.model
+    def _default_company_id(self):
+        if self._context.get('default_project_id'):
+            return self.env['project.project'].browse(self._context['default_project_id']).company_id
+        return self.env['res.company']._company_default_get()
+
+    @api.model
+    def _read_group_stage_ids(self, stages, domain, order):
+        search_domain = [('id', 'in', stages.ids)]
+        if 'default_project_id' in self.env.context:
+            search_domain = ['|', ('project_ids', '=', self.env.context['default_project_id'])] + search_domain
+
+        stage_ids = stages._search(search_domain, order=order, access_rights_uid=SUPERUSER_ID)
+        return stages.browse(stage_ids)
+
+    @api.model
+    def get_empty_list_help(self, help):
+        tname = _("requerimiento")
+        project_id = self.env.context.get('default_project_id', False)
+        if project_id:
+            name = self.env['project.project'].browse(project_id).label_requerimientos
+            if name: tname = name.lower()
+
+        self = self.with_context(
+            empty_list_help_id=self.env.context.get('default_project_id'),
+            empty_list_help_model='project.project',
+            empty_list_help_document_name=tname,
+        )
+        return super(Requerimiento, self).get_empty_list_help(help)
+
+    '''
+    @api.model
+    def create(self, vals):
+        # context: no_log, because subtype already handle this
+        context = dict(self.env.context, mail_create_nolog=True)
+        # for default stage
+        if vals.get('project_id') and not context.get('default_project_id'):
+            context['default_project_id'] = vals.get('project_id')
+        # user_id change: update date_assign
+        if vals.get('user_id'):
+            vals['date_assign'] = fields.Datetime.now()
+        # Stage change: Update date_end if folded stage and date_last_stage_update
+        if vals.get('stage_id'):
+            vals.update(self.update_date_end(vals['stage_id']))
+            vals['date_last_stage_update'] = fields.Datetime.now()
+        requerimiento = super(Requerimiento, self.with_context(context)).create(vals)
+        return requerimiento         
+    '''           
