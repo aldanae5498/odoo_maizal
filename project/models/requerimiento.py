@@ -25,7 +25,7 @@ class Requerimiento(models.Model):
         change_default=True
     )
 
-    fecha_inicial = fields.Datetime("Fecha Inicial", required=True, index=True)
+    fecha_inicial = fields.Datetime("Fecha Inicial")
     fecha_limite = fields.Datetime("Fecha Límite", required=True, index=True)
     state = fields.Selection(
         [
@@ -59,21 +59,25 @@ class Requerimiento(models.Model):
 
     # Funciones que cambia el state del requerimiento:
     def action_confirmar(self):
+        self.env.user.notify_success(message='¡Requerimiento aceptado exitosamente!')
         self.state = 'confirmado'
 
     def action_hecho(self):
+        self.env.user.notify_success(message='¡Requerimiento validado exitosamente!')
         self.state = 'hecho'
 
     def action_borrador(self):
+        self.env.user.notify_success(message='El requerimiento ha sido establecido como borrador')
         self.state = 'borrador'
 
     def action_cancelar(self):
+        self.env.user.notify_warning(message='El requerimiento ha sido devuelto')
         self.state = 'cancelado'                        
 
     # Secuencia:
     @api.model
     def create(self, vals):
-        self.env.user.notify_success(message='Requerimiento registrado exitosamente')
+        self.env.user.notify_success(message='¡Requerimiento creado exitosamente!')
         if vals.get('name', _('Nuevo')) == _('Nuevo'):
             vals['name'] = self.env['ir.sequence'].next_by_code('project.requerimiento') or _('Nuevo')
         res = super(Requerimiento, self).create(vals)
