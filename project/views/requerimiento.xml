@@ -9,13 +9,62 @@
                 <field name="name"/>
                 <field name="titulo"/>
                 <field name="project_id"/>
-                <field name="fecha_inicial"/>
+                <field name="create_date" string="Fecha Inicial"/>
                 <field name="fecha_limite"/>
                 <field name="state"/>
             </tree>
         </field>
     </record>
-    
+
+    <!-- ==================== Listado / Kanban ====================  -->
+    <record model="ir.ui.view" id="project_requerimiento_kanban">
+        <field name="name">project.requerimiento.kanban</field>
+        <field name="model">project.requerimiento</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="name"/>
+                <field name="titulo"/>
+                <field name="project_id"/>
+                <field name="director_id"/>
+                <field name="lider_id"/>
+                <field name="gestor_id"/>
+                <templates>
+                <t t-name="kanban-box">
+                    <div class="oe_kanban_card oe_kanban_global_click">
+                        <div class="oe_kanban_content">
+                            <div class="o_kanban_record_top" style="font-size: 15px;"> 
+                                <div class="o_kanban_record_headings">
+                                    <strong>[<field name="name"/>]: </strong><span><field name="titulo"/></span>
+                                    <div style="height: 5px;"></div>            
+                                    <b>Proyecto: </b> <span><field name="project_id"/></span>
+                                </div>
+                            </div>
+                            <div class="" style="color: #7C7BAD;margin-top: 10px;font-size: 12px;">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td><b>Director: </b></td>
+                                            <td><field name="director_id"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Líder: </b></td>
+                                            <td><field name="lider_id"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Gestor: </b></td>
+                                            <td><field name="gestor_id"/></td>
+                                        </tr>                                        
+                                    </tbody>
+                                </table>                                                                
+                            </div>
+                        </div>
+                        <div class="oe_clear"></div>
+                    </div>
+                </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>    
 
     <!-- ==================== Formulario ==================== -->
     <record id="project_requerimiento_form" model="ir.ui.view">
@@ -64,7 +113,7 @@
                     </div>
                     <group>
                         <field name="project_id"/>
-                        <field name="fecha_inicial"/>
+                        <!-- <field name="create_date"/> --> 
                         <field name="fecha_limite"/>
                     </group>
                     
