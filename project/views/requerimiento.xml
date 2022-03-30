@@ -80,6 +80,7 @@
                     />
 
                     <button id="button_hecho" name="action_hecho" string="Validar" class="btn-primary" states="confirmado"
+                        confirm="¿Estás seguro(a) que desea validar el requerimiento?"
                         type="object"
                     />
 
