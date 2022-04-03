@@ -74,13 +74,25 @@ class Requerimiento(models.Model):
 
     def action_cancelar(self):
         self.env.user.notify_warning(message='El requerimiento ha sido devuelto')
-        self.state = 'cancelado'                        
+        self.state = 'borrador'
+        # self.state = 'cancelado'                        
 
     '''
     @api.onchange('project_id')
     def onchange_project_id(self):    
         self.env.user.notify_success(message='Project ID: ' + str(self.project_id.codigo))
     '''
+
+    def get_codigo_requerimiento(self, project_id, codigo_proyecto):
+        count_pro_req = self.env['project.requerimiento'].search_count([('project_id', '=', project_id)])
+        count_pro_req = count_pro_req + 1
+        count_pro_req = str(count_pro_req)
+        if len(count_pro_req) == 1:
+            count_pro_req = '0' + count_pro_req
+
+        # Código del Requerimiento:
+        codigo_requerimiento = str(codigo_proyecto) + '-' + str(count_pro_req)
+        return codigo_requerimiento
 
     # Secuencia:
     @api.model
@@ -97,7 +109,15 @@ class Requerimiento(models.Model):
             if len(count_pro_req) == 1:
                 count_pro_req = '0' + count_pro_req
 
-            vals['name'] = str(codigo_proyecto) + '-' + str(count_pro_req)
+            # Código del Requerimiento:
+            codigo_requerimiento = self.get_codigo_requerimiento(vals['project_id'], codigo_proyecto)
+
+            # Verificando si existe un requerimiento con éste código:
+            row_count = self.env['project.requerimiento'].search_count([('name', '=', codigo_proyecto)])
+            if row_count > 0:
+                codigo_requerimiento = self.get_codigo_requerimiento(vals['project_id'], codigo_proyecto)
+
+            vals['name'] = codigo_requerimiento
             # self.env.user.notify_success(message = 'Código del  Proyecto: ' + str(codigo_proyecto))
         res = super(Requerimiento, self).create(vals)
         return res    
