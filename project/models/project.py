@@ -63,13 +63,14 @@ class ProjectTaskType(models.Model):
                 stages = self.filtered(lambda x: x not in shared_stages)
         return super(ProjectTaskType, stages).unlink()
 
-
 class Project(models.Model):
     _name = "project.project"
     _description = "Project"
     _inherit = ['portal.mixin', 'mail.alias.mixin', 'mail.thread']
-    _order = "sequence, name, id"
+    # _order = "sequence, name, id"
+    _order = "name"
     _period_number = 5
+    _rec_name = "name"
 
     def get_alias_model_name(self, vals):
         return vals.get('alias_model', 'project.task')
@@ -169,7 +170,8 @@ class Project(models.Model):
     def _get_default_favorite_user_ids(self):
         return [(6, 0, [self.env.uid])]
 
-    name = fields.Char("Name", index=True, required=True, track_visibility='onchange')
+    codigo = fields.Char(string='Código', required=True, copy=False, readonly=True, index=True, default=lambda self: _('Nuevo'))
+    name = fields.Char("Nombre", index=True, required=True, track_visibility='onchange')
     active = fields.Boolean(default=True,
         help="If the active field is set to False, it will allow you to hide the project without removing it.")
     sequence = fields.Integer(default=10, help="Gives the sequence order when displaying a list of Projects.")
@@ -321,17 +323,36 @@ class Project(models.Model):
             self.map_tasks(project.id)
         return project
 
+    # Secuencia:
+    @api.model
+    def create(self, vals):
+        self.env.user.notify_success(message='¡Proyecto creado exitosamente!')
+        if vals.get('codigo', _('Nuevo')) == _('Nuevo'):
+            vals['codigo'] = self.env['ir.sequence'].next_by_code('project.project') or _('Nuevo')
+        res = super(Project, self).create(vals)
+        return res
+
+    '''
     @api.model
     def create(self, vals):
         # Prevent double project creation
-        self = self.with_context(mail_create_nosubscribe=True)
-        project = super(Project, self).create(vals)
+        self_param = self
+        self_with_context = self.with_context(mail_create_nosubscribe=True)
+        project = super(Project, self_with_context).create(vals)
+        
+
+        # Código de proyecto:
+        self_param.env.user.notify_success(message='¡Proyecto creado exitosamente!')
+        if vals.get('name', _('Nuevo')) == _('Nuevo'):
+            vals['name'] = self_param.env['ir.sequence'].next_by_code('project.project') or _('Nuevo')     
+
         if not vals.get('subtask_project_id'):
             project.subtask_project_id = project.id
         if project.privacy_visibility == 'portal' and project.partner_id:
             project.message_subscribe(project.partner_id.ids)
-        return project
-
+        return project    
+    '''
+    
     @api.multi
     def write(self, vals):
         # directly compute is_favorite to dodge allow write access right
