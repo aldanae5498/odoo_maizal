@@ -20,8 +20,10 @@ class Requerimiento(models.Model):
     project_id = fields.Many2one(
         'project.project', 
         string='Proyecto', 
-        required=True,default=lambda self: self.env.context.get('default_project_id'), 
-        index=True, track_visibility='onchange',
+        required=True,
+        # default=lambda self: self.env.context.get('default_project_id'), 
+        index=True, 
+        track_visibility='onchange',
         change_default=True
     )
 
@@ -74,15 +76,32 @@ class Requerimiento(models.Model):
         self.env.user.notify_warning(message='El requerimiento ha sido devuelto')
         self.state = 'cancelado'                        
 
+    '''
+    @api.onchange('project_id')
+    def onchange_project_id(self):    
+        self.env.user.notify_success(message='Project ID: ' + str(self.project_id.codigo))
+    '''
+
     # Secuencia:
     @api.model
     def create(self, vals):
         self.env.user.notify_success(message='¡Requerimiento creado exitosamente!')
         if vals.get('name', _('Nuevo')) == _('Nuevo'):
-            vals['name'] = self.env['ir.sequence'].next_by_code('project.requerimiento') or _('Nuevo')
-        res = super(Requerimiento, self).create(vals)
-        return res
+            # vals['name'] = self.env['ir.sequence'].next_by_code('project.requerimiento') or _('Nuevo')
+            # vals['name'] = str(vals['project_id']) # ---- Funciona
+            codigo_proyecto = self.env['project.project'].search([('id', '=', vals['project_id'])], limit=1).codigo
+            
+            count_pro_req = self.env['project.requerimiento'].search_count([('project_id', '=', vals['project_id'])])
+            count_pro_req = count_pro_req + 1
+            count_pro_req = str(count_pro_req)
+            if len(count_pro_req) == 1:
+                count_pro_req = '0' + count_pro_req
 
+            vals['name'] = str(codigo_proyecto) + '-' + str(count_pro_req)
+            # self.env.user.notify_success(message = 'Código del  Proyecto: ' + str(codigo_proyecto))
+        res = super(Requerimiento, self).create(vals)
+        return res    
+    
     # Vista a documentos:
     @api.multi
     def attachment_tree_view(self):
