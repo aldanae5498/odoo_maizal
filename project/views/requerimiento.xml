@@ -126,12 +126,27 @@
                         <field name="lider_id"/>
                         <field name="gestor_id"/>
                     </group>     
+                    
                     <notebook>
                         <page string="Descripción">
                             <field name="descripcion" type="html"/>
                             <div class="oe_clear"/>
-                        </page>                                                  
-                    </notebook>
+                        </page>
+                        <page string="Servicios">
+                            <group>
+                                <group>
+                                    <field name="s_tarjeta_debito"/>
+                                    <field name="s_tarjeta_credito"/>
+                                    <field name="s_autorizador"/>
+                                </group>
+                                <group>
+                                    <field name="s_compensacion_redes"/>
+                                    <field name="s_compensacion_bpo"/>
+                                    <field name="s_compensacion_entidades_financieras"/>
+                                </group>                                
+                            </group>
+                        </page>                                                                                
+                    </notebook>               
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers"/>
