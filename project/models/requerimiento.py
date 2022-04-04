@@ -52,6 +52,15 @@ class Requerimiento(models.Model):
     # Número de documentos:
     doc_count = fields.Integer(compute='_compute_attached_docs_count', string="Number of documents attached")
 
+    # Servicios:
+    s_tarjeta_debito = fields.Boolean(string='Tarjeta de Débito', default=False)
+    s_tarjeta_credito = fields.Boolean(string='Tarjeta de Crédito', default=False)
+    s_autorizador = fields.Boolean(string='Autorizador', default=False)
+    s_compensacion_redes = fields.Boolean(string='Compensación Redes', default=False)
+    s_compensacion_bpo = fields.Boolean(string='Compensación BPO', default=False)
+    s_compensacion_entidades_financieras = fields.Boolean(string='Compensación Entidades Financieras', default=False)
+
+
     def _compute_attached_docs_count(self):
         Attachment = self.env['ir.attachment']
         for requerimiento in self:
