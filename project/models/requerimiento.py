@@ -14,26 +14,38 @@ class Requerimiento(models.Model):
     _order = "name"
     _rec_name = "name"
 
-    name = fields.Char(string='Código de Requerimiento', required=True, copy=False, readonly=True, states={'borrador': [('readonly', False)]}, index=True, default=lambda self: _('Nuevo'))
+    name = fields.Char(string='Código de Requerimiento', required=True, copy=False, readonly=True, states={'borrador': [('readonly', False)]}, index=True, default=lambda self: _('Esperando aprobación'))
     titulo = fields.Char("Título", index=True, required=True, track_visibility='onchange')
     
     project_id = fields.Many2one(
         'project.project', 
         string='Proyecto', 
-        required=True,
+        required=False,
+        states={
+            'aprobado': [('required', True)],
+        },
         # default=lambda self: self.env.context.get('default_project_id'), 
         index=True, 
         track_visibility='onchange',
-        change_default=True
+        change_default=True,
     )
 
     fecha_inicial = fields.Datetime("Fecha Inicial")
-    fecha_limite = fields.Datetime("Fecha Límite", required=True, index=True)
+    
+    fecha_limite = fields.Datetime(
+        "Fecha Límite", 
+        required=False, 
+        index=True,
+        states={
+            'aprobado': [('required', True)],
+        }           
+    )
+
     state = fields.Selection(
         [
             ('borrador', 'Borrador'),
-            ('confirmado', 'Aceptado'),
-            ('hecho', 'Validado'),
+            ('radicado', 'Radicado'),
+            ('aprobado', 'Aprobado'),
             ('cancelado', 'Devuelto'),
         ],
         string = 'Estado',
@@ -42,9 +54,32 @@ class Requerimiento(models.Model):
     )
 
     # Interesados:
-    director_id = fields.Many2one('res.partner', string='Director')
-    lider_id = fields.Many2one('res.partner', string='Líder')
-    gestor_id = fields.Many2one('res.partner', string='Gestor') 
+    director_id = fields.Many2one(
+        'res.partner', 
+        string='Director',
+        required=False,
+        states={
+            'aprobado': [('required', True)],
+        }        
+    )
+
+    lider_id = fields.Many2one(
+        'res.partner', 
+        string='Líder',
+        required=False,
+        states={
+            'aprobado': [('required', True)],
+        }          
+    )
+
+    gestor_id = fields.Many2one(
+        'res.partner', 
+        string='Gestor',
+        required=False,
+        states={
+            'aprobado': [('required', True)],
+        }          
+    ) 
 
     # Descripción:
     descripcion = fields.Html("Descripción")
@@ -60,6 +95,23 @@ class Requerimiento(models.Model):
     s_compensacion_bpo = fields.Boolean(string='Compensación BPO', default=False)
     s_compensacion_entidades_financieras = fields.Boolean(string='Compensación Entidades Financieras', default=False)
 
+    # Color para el kanban:
+    color = fields.Integer(string='Color Index', default=0, compute='change_color_on_kanban')
+
+    def change_color_on_kanban(self):
+        """    this method is used to chenge color index    base on fee status    ----------------------------------------    :return: index of color for kanban view    """    
+        for record in self:
+            color = 0
+            if record.state == 'borrador':
+                color = 4 # Azul claro
+            elif record.state == 'radicado':
+                color = 11 # Morado
+            elif record.state == 'aprobado':
+                color = 10 # Verde
+            else: # cancelado
+                color = 1 # Rojo
+
+            record.color = color
 
     def _compute_attached_docs_count(self):
         Attachment = self.env['ir.attachment']
@@ -69,19 +121,19 @@ class Requerimiento(models.Model):
             ])    
 
     # Funciones que cambia el state del requerimiento:
-    def action_confirmar(self):
-        self.env.user.notify_success(message='¡Requerimiento aceptado exitosamente!')
-        self.state = 'confirmado'
+    def action_radicar(self):
+        self.env.user.notify_success(message='¡Requerimiento radicado exitosamente!')
+        self.state = 'radicado'
 
-    def action_hecho(self):
+    def action_aprobar(self):
         self.env.user.notify_success(message='¡Requerimiento validado exitosamente!')
-        self.state = 'hecho'
+        self.state = 'aprobado'
 
     def action_borrador(self):
         self.env.user.notify_success(message='El requerimiento ha sido establecido como borrador')
         self.state = 'borrador'
 
-    def action_cancelar(self):
+    def action_devolver(self):
         self.env.user.notify_warning(message='El requerimiento ha sido devuelto')
         self.state = 'borrador'
         # self.state = 'cancelado'                        
@@ -104,6 +156,34 @@ class Requerimiento(models.Model):
         return codigo_requerimiento
 
     # Secuencia:
+    @api.multi
+    def write(self, values):
+        project_id = values.get('project_id')
+        state = values.get('state')
+        
+        if state != 'aprobado':
+            values['name'] = 'Esperando aprobación'
+        else:
+            codigo_proyecto = self.env['project.project'].search([('id', '=', project_id)], limit=1).codigo
+
+            count_pro_req = self.env['project.requerimiento'].search_count([('project_id', '=', project_id)])
+            count_pro_req = count_pro_req + 1
+            count_pro_req = str(count_pro_req)
+            if len(count_pro_req) == 1:
+                count_pro_req = '0' + count_pro_req
+
+            # Código del Requerimiento:
+            codigo_requerimiento = self.get_codigo_requerimiento(project_id, codigo_proyecto)
+
+            # Verificando si existe un requerimiento con éste código:
+            row_count = self.env['project.requerimiento'].search_count([('name', '=', codigo_proyecto)])
+            if row_count > 0:
+                codigo_requerimiento = self.get_codigo_requerimiento(project_id, codigo_proyecto)
+            values['name'] = codigo_requerimiento
+        
+        return super(Requerimiento, self).write(values)
+    
+    '''
     @api.model
     def create(self, vals):
         self.env.user.notify_success(message='¡Requerimiento creado exitosamente!')
@@ -129,7 +209,9 @@ class Requerimiento(models.Model):
             vals['name'] = codigo_requerimiento
             # self.env.user.notify_success(message = 'Código del  Proyecto: ' + str(codigo_proyecto))
         res = super(Requerimiento, self).create(vals)
-        return res    
+        return res
+    '''       
+    
     
     # Vista a documentos:
     @api.multi
