@@ -127,7 +127,7 @@ class Requerimiento(models.Model):
         self.state = 'radicado'
 
     def action_aprobar(self):
-        self.env.user.notify_success(message='¡Requerimiento validado exitosamente!')
+        self.env.user.notify_success(message='¡Requerimiento aprobado exitosamente!')
         self.state = 'aprobado'
 
     def action_borrador(self):
