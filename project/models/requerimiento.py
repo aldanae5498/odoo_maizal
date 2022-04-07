@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from curses.ascii import NUL
 from datetime import timedelta
 
 from odoo import api, fields, models, tools, SUPERUSER_ID, _
@@ -160,26 +161,35 @@ class Requerimiento(models.Model):
     def write(self, values):
         project_id = values.get('project_id')
         state = values.get('state')
-        
-        if state != 'aprobado':
+
+        if state == 'borrador' or state == 'radicado':
             values['name'] = 'Esperando aprobación'
+            if state == 'borrador':
+                values['project_id'] = ''
+                values['director_id'] = ''
+                values['lider_id'] = ''
+                values['gestor_id'] = ''
         else:
             codigo_proyecto = self.env['project.project'].search([('id', '=', project_id)], limit=1).codigo
 
-            count_pro_req = self.env['project.requerimiento'].search_count([('project_id', '=', project_id)])
-            count_pro_req = count_pro_req + 1
-            count_pro_req = str(count_pro_req)
-            if len(count_pro_req) == 1:
-                count_pro_req = '0' + count_pro_req
+            if codigo_proyecto == False:
+                values['name'] = 'Esperando asignación de proyecto'
+            else:
+                count_pro_req = self.env['project.requerimiento'].search_count([('project_id', '=', project_id)])
+                count_pro_req = count_pro_req + 1
+                count_pro_req = str(count_pro_req)
+                if len(count_pro_req) == 1:
+                    count_pro_req = '0' + count_pro_req
 
-            # Código del Requerimiento:
-            codigo_requerimiento = self.get_codigo_requerimiento(project_id, codigo_proyecto)
-
-            # Verificando si existe un requerimiento con éste código:
-            row_count = self.env['project.requerimiento'].search_count([('name', '=', codigo_proyecto)])
-            if row_count > 0:
+                # Código del Requerimiento:
                 codigo_requerimiento = self.get_codigo_requerimiento(project_id, codigo_proyecto)
-            values['name'] = codigo_requerimiento
+
+                # Verificando si existe un requerimiento con éste código:
+                row_count = self.env['project.requerimiento'].search_count([('name', '=', codigo_proyecto)])
+                if row_count > 0:
+                    codigo_requerimiento = self.get_codigo_requerimiento(project_id, codigo_proyecto)
+
+                values['name'] = codigo_requerimiento
         
         return super(Requerimiento, self).write(values)
     
