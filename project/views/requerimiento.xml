@@ -115,7 +115,7 @@
                     <div class="oe_title">    
                         <h1>
                             <!-- <span>Código</span>: --> 
-                            <field name="name" readonly="1"/>
+                            <field name="name" readonly="1" attrs="{'invisible': [('state','in',('borrador','radicado'))]}"/>
                         </h1>
                     </div>                
                     <div class="oe_title pr-0">
