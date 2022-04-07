@@ -738,12 +738,29 @@
             </field>
         </record>
 
-        <!-- Requerimientos -->
-        <record id="action_view_requerimiento" model="ir.actions.act_window">
+        <!-- Formulario para Radicar Solicitud (crear Requerimiento) -->
+        <record id="action_view_radicar_solicitud" model="ir.actions.act_window">
+            <field name="name">project.requerimiento.view.form</field>
+            <field name="res_model">project.requerimiento</field>
+            <field name="view_mode">form</field>
+        </record>                
+
+        <!-- Solicitudes (Radicadas) -->
+        <record id="action_view_solicitudes_radicadas" model="ir.actions.act_window">
             <field name="name">Requerimientos</field>
             <field name="res_model">project.requerimiento</field>
             <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('state', 'in', ['borrador', 'radicado'])]</field>
         </record>        
+
+        <!-- Solicitudes (Aprobadas) -->
+        <record id="action_view_solicitudes_aprobadas" model="ir.actions.act_window">
+            <field name="name">Requerimientos</field>
+            <field name="res_model">project.requerimiento</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('state', '=', 'aprobado')]</field>
+        </record>        
+
 
         <record id="open_view_task_list_kanban" model="ir.actions.act_window.view">
             <field name="sequence" eval="0"/>
@@ -759,9 +776,19 @@
         <menuitem name="All Tasks" id="menu_project_management" parent="menu_main_pm"
             action="action_view_task" sequence="2" groups="base.group_no_one,group_project_user"/>
 
-        <!-- Requerimientos -->
-        <menuitem name="Requerimientos" id="menu_project_requerimiento" parent="menu_main_pm"
-            action="action_view_requerimiento" sequence="3" groups="base.group_no_one,group_project_user"/>            
+        <!-- Solicitudes -->
+        <menuitem name="Mis Solicitudes" id="menu_project_requerimiento" parent="menu_main_pm"
+            sequence="3" groups="base.group_no_one,group_project_user"/>
+            <!-- Formulario para Radicar Solicitud (crear Requerimiento) -->
+            <menuitem name="Radicar" id="opcion_radicar_solicitud" parent="menu_project_requerimiento"
+            action="action_view_radicar_solicitud" sequence="1"/>
+            <!-- Solicitudes Radicadas -->
+            <menuitem name="Radicadas" id="opcion_solicitudes_radicadas" parent="menu_project_requerimiento"
+            action="action_view_solicitudes_radicadas" sequence="2"/>        
+            <!-- Solicitudes Aprobadas -->
+            <menuitem name="Aprobadas" id="opcion_solicitudes_aprobadas" parent="menu_project_requerimiento"
+            action="action_view_solicitudes_aprobadas" sequence="3"/>                                          
+
 
         <record id="project_task_action_from_partner" model="ir.actions.act_window">
             <field name="name">Tasks</field>
