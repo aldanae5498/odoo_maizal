@@ -52,7 +52,7 @@
     </record>
 
 <!-- <data noupdate="1"> -->
-<data noupdate="1">
+<data>
     <record id="base.default_user" model="res.users">
         <field name="groups_id" eval="[(4,ref('project.group_project_manager'))]"/>
     </record>
@@ -129,12 +129,14 @@
 
     <!-- ====================================== Reglas Personalizadas ====================================== -->
     <!-- Proyecto - Líder -->
+    <!-- 
     <record id="project_manager_record_rule" model="ir.rule">
         <field name="name">Ver solamente sus proyectos</field>
         <field name="model_id" ref="model_project_project"/>
         <field name="domain_force">['|', ('create_uid','=',user.id), ('create_uid','=',False)]</field>
         <field name="groups" eval="[(4, ref[('group_project_director'), ('group_project_lider')])]"/>
     </record>
+     -->
 
     <!-- Requerimiento - Cliente -->
     <record id="project_manager_record_rule" model="ir.rule">
