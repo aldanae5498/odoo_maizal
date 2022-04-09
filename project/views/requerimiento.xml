@@ -12,6 +12,7 @@
                 <field name="create_date" string="Fecha Inicial"/>
                 <field name="fecha_limite"/>
                 <field name="state"/>
+                <field name="create_uid" string="Creado por"/>
             </tree>
         </field>
     </record>
@@ -95,24 +96,33 @@
         <field name="arch" type="xml">
             <form string="Requerimientos">
                 <header>
-                    <button name="btn_send_email" string="Enviar correo" type="action" class="oe_highlight oe_edit_only"/>
+                    <button name="btn_send_email" string="Enviar correo" 
+                        class="oe_highlight oe_edit_only"
+                        type="action"
+                        groups="project.group_project_manager,project.group_project_director"
+                    />
+
                     <button id="button_confirmar" name="action_radicar" string="Radicar" class="btn-primary" states="borrador"
                         confirm="¿Estás seguro(a) que desea radicar el requerimiento?" 
                         type="object"
+                        groups="project.group_project_manager,project.group_project_director"
                     />
 
                     <button id="button_hecho" name="action_aprobar" string="Aprobar" class="btn-primary" states="radicado"
                         confirm="¿Estás seguro(a) que desea aprobar el requerimiento?"
                         type="object"
+                        groups="project.group_project_manager,project.group_project_director"
                     />
 
                     <button id="button_borrador" name="action_borrador" string="Establecer a borrador" class="btn-primary" states="cancelado"
                         type="object"
+                        groups="project.group_project_manager,project.group_project_director"
                     />
 
                     <button id="button_cancelar" name="action_devolver" string="Devolver" class="btn-primary" states="borrador,aprobado,radicado"
                         confirm="¿Estás seguro(a) que desea devolver el requerimiento?"
                         type="object"
+                        groups="project.group_project_manager,project.group_project_director"
                     />                                                                
 
                     <field name="state" widget="statusbar" statusbar_visible="borrador,aprobado,radicado"/>
@@ -126,7 +136,7 @@
                     <div class="oe_title">    
                         <h1>
                             <!-- <span>Código</span>: --> 
-                            <field name="name" readonly="1" attrs="{'invisible': [('state','in',('borrador','radicado'))]}"/>
+                            <field name="name" readonly="1" attrs="{'invisible': [('state','in',('borrador','radicado'))]}" groups="project.group_project_manager,project.group_project_user"/>
                         </h1>
                     </div>                
                     <div class="oe_title pr-0">
@@ -178,6 +188,6 @@
                 </div>                
             </form>
         </field>
-    </record>    
+    </record>      
 
 </odoo>
