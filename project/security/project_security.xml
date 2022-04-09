@@ -11,33 +11,33 @@
 
     <record id="group_project_gestor" model="res.groups">
         <field name="name">Gestor</field>
-        <field name="implied_ids" eval="[(4, ref('group_project_user'))]"/>
+        <!-- <field name="implied_ids" eval="[(4, ref('group_project_user'))]"/> -->
         <field name="category_id" ref="base.module_category_project_management"/>
     </record>      
 
     <record id="group_project_ingeniero" model="res.groups">
         <field name="name">Ingeniero</field>
-        <field name="implied_ids" eval="[(4, ref('group_project_gestor'))]"/>
+        <!-- <field name="implied_ids" eval="[(4, ref('group_project_gestor'))]"/> -->
         <field name="category_id" ref="base.module_category_project_management"/>
     </record>            
 
     <record id="group_project_lider" model="res.groups">
         <field name="name">Líder</field>
-        <field name="implied_ids" eval="[(4, ref('group_project_ingeniero'))]"/>
+        <!-- <field name="implied_ids" eval="[(4, ref('group_project_ingeniero'))]"/> -->
         <field name="category_id" ref="base.module_category_project_management"/>
     </record> 
 
     <record id="group_project_director" model="res.groups">
         <field name="name">Director</field>
-        <field name="implied_ids" eval="[(4, ref('group_project_lider'))]"/>
+        <!-- <field name="implied_ids" eval="[(4, ref('group_project_lider'))]"/> -->
         <field name="category_id" ref="base.module_category_project_management"/>
     </record> 
 
     <record id="group_project_manager" model="res.groups">
         <field name="name">Manager</field>
+        <!-- <field name="implied_ids" eval="[(4, ref('group_project_director'))]"/> -->
         <field name="category_id" ref="base.module_category_project_management"/>
-        <field name="implied_ids" eval="[(4, ref('group_project_director'))]"/>
-        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        <!-- <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/> -->
     </record>
 
     <!-- ============================================================================ -->
@@ -51,130 +51,157 @@
         <field name="category_id" ref="base.module_category_hidden"/>
     </record>
 
-<!-- <data noupdate="1"> -->
-<data>
-    <record id="base.default_user" model="res.users">
-        <field name="groups_id" eval="[(4,ref('project.group_project_manager'))]"/>
-    </record>
+    <!-- <data noupdate="1"> -->
+    <data noupdate="0">
+        <!--
+        <record id="base.default_user" model="res.users">
+            <field name="groups_id" eval="[(4,ref('project.group_project_manager'))]"/>
+        </record>
+        -->
 
-    <!--
-    <record model="ir.rule" id="project_comp_rule">
-        <field name="name">Project: multi-company</field>
-        <field name="model_id" ref="model_project_project"/>
-        <field name="global" eval="True"/>
-        <field name="domain_force">['|',
-                                        ('company_id', '=', False),
-                                        ('company_id', 'child_of', [user.company_id.id]),
-                                    ]</field>
-    </record>
+        <!--
+        <record model="ir.rule" id="project_comp_rule">
+            <field name="name">Project: multi-company</field>
+            <field name="model_id" ref="model_project_project"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|',
+                                            ('company_id', '=', False),
+                                            ('company_id', 'child_of', [user.company_id.id]),
+                                        ]</field>
+        </record>
 
-    <record model="ir.rule" id="project_project_manager_rule">
-        <field name="name">Project: project manager: see all</field>
-        <field name="model_id" ref="model_project_project"/>
-        <field name="domain_force">[(1, '=', 1)]</field>
-        <field name="groups" eval="[(4,ref('project.group_project_manager'))]"/>
-    </record>
+        <record model="ir.rule" id="project_public_members_rule">
+            <field name="name">Project: employees: following required for follower-only projects</field>
+            <field name="model_id" ref="model_project_project"/>
+            <field name="domain_force">['|','|',
+                                            ('privacy_visibility', '!=', 'followers'),
+                                            ('message_partner_ids', 'in', [user.partner_id.id]),
+                                            ('task_ids.message_partner_ids', 'in', [user.partner_id.id]),
+                                        ]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        -->
 
-    <record model="ir.rule" id="project_public_members_rule">
-        <field name="name">Project: employees: following required for follower-only projects</field>
-        <field name="model_id" ref="model_project_project"/>
-        <field name="domain_force">['|','|',
-                                        ('privacy_visibility', '!=', 'followers'),
-                                        ('message_partner_ids', 'in', [user.partner_id.id]),
-                                        ('task_ids.message_partner_ids', 'in', [user.partner_id.id]),
-                                    ]</field>
-        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
-    </record>
-    -->
+        <!--
+        <record model="ir.rule" id="task_comp_rule">
+            <field name="name">Project/Task: multi-company</field>
+            <field name="model_id" ref="model_project_task"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|',
+                                            ('company_id', '=', False),
+                                            ('company_id', 'child_of', [user.company_id.id]),
+                                        ]</field>
+        </record>
+        
 
-    <record model="ir.rule" id="task_comp_rule">
-        <field name="name">Project/Task: multi-company</field>
-        <field name="model_id" ref="model_project_task"/>
-        <field name="global" eval="True"/>
-        <field name="domain_force">['|',
-                                        ('company_id', '=', False),
-                                        ('company_id', 'child_of', [user.company_id.id]),
-                                    ]</field>
-    </record>
-
-    <record model="ir.rule" id="task_visibility_rule">
-        <field name="name">Project/Task: employees: follow required for follower-only projects</field>
-        <field name="model_id" ref="model_project_task"/>
-        <field name="domain_force">[
-        '|',
-            ('project_id.privacy_visibility', '!=', 'followers'),
+        <record model="ir.rule" id="task_visibility_rule">
+            <field name="name">Project/Task: employees: follow required for follower-only projects</field>
+            <field name="model_id" ref="model_project_task"/>
+            <field name="domain_force">[
             '|',
-                ('project_id.message_partner_ids', 'in', [user.partner_id.id]),
+                ('project_id.privacy_visibility', '!=', 'followers'),
                 '|',
-                    ('message_partner_ids', 'in', [user.partner_id.id]),
-                    # to subscribe check access to the record, follower is not enough at creation
-                    ('user_id', '=', user.id)
-        ]</field>
-        <field name="groups" eval="[(4,ref('base.group_user'))]"/>
-    </record>
+                    ('project_id.message_partner_ids', 'in', [user.partner_id.id]),
+                    '|',
+                        ('message_partner_ids', 'in', [user.partner_id.id]),
+                        # to subscribe check access to the record, follower is not enough at creation
+                        ('user_id', '=', user.id)
+            ]</field>
+            <field name="groups" eval="[(4,ref('base.group_user'))]"/>
+        </record>
 
-    <record model="ir.rule" id="project_manager_all_project_tasks_rule">
-        <field name="name">Project/Task: project manager: see all</field>
-        <field name="model_id" ref="model_project_task"/>
-        <field name="domain_force">[(1, '=', 1)]</field>
-        <field name="groups" eval="[(4,ref('project.group_project_manager'))]"/>
-    </record>
-
-    <record model="ir.rule" id="report_project_task_user_report_comp_rule">
-        <field name="name">Task Analysis multi-company</field>
-        <field name="model_id" ref="model_report_project_task_user"/>
-        <field name="global" eval="True"/>
-        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
-    </record>
-
-    <!-- ====================================== Reglas Personalizadas ====================================== -->
-    <!-- Proyecto - Líder -->
-    <!-- 
-    <record id="project_manager_record_rule" model="ir.rule">
-        <field name="name">Ver solamente sus proyectos</field>
-        <field name="model_id" ref="model_project_project"/>
-        <field name="domain_force">['|', ('create_uid','=',user.id), ('create_uid','=',False)]</field>
-        <field name="groups" eval="[(4, ref[('group_project_director'), ('group_project_lider')])]"/>
-    </record>
-     -->
-
-    <!-- Requerimiento - Cliente -->
-    <record id="project_manager_record_rule" model="ir.rule">
-        <field name="name">Ver solamente sus solicitudes / requerimientos</field>
-        <field name="model_id" ref="model_project_requerimiento"/>
-        <field name="domain_force">['|', ('create_uid','=',user.id), ('create_uid','=',False)]</field>
-        <field name="groups" eval="[(4, ref('group_project_user'))]"/>
-    </record>
+        <record model="ir.rule" id="report_project_task_user_report_comp_rule">
+            <field name="name">Task Analysis multi-company</field>
+            <field name="model_id" ref="model_report_project_task_user"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+        </record>
+        -->
 
 
-    <!-- Portal -->
-    <!--
-    <record id="project_project_rule_portal" model="ir.rule">
-        <field name="name">Project: portal users: portal and following</field>
-        <field name="model_id" ref="project.model_project_project"/>
-        <field name="domain_force">[
-            '&amp;',
-                ('privacy_visibility', '=', 'portal'),
-                ('message_partner_ids', 'child_of', [user.partner_id.commercial_partner_id.id]),
-        ]</field>
-        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
-    </record>
-     -->
 
-    <record id="project_task_rule_portal" model="ir.rule">
-        <field name="name">Project/Task: portal users: (portal and following project) or (portal and following task)</field>
-        <field name="model_id" ref="project.model_project_task"/>
-        <field name="domain_force">[
-        '|',
-            '&amp;',
-                ('project_id.privacy_visibility', '=', 'portal'),
-                ('project_id.message_partner_ids', 'child_of', [user.partner_id.commercial_partner_id.id]),
-            '&amp;',
-                ('project_id.privacy_visibility', '=', 'portal'),
-                ('message_partner_ids', 'child_of', [user.partner_id.commercial_partner_id.id]),
-        ]</field>
-        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
-    </record>
+        <!-- Portal -->
+        <!--
+        <record id="project_project_rule_portal" model="ir.rule">
+            <field name="name">Project: portal users: portal and following</field>
+            <field name="model_id" ref="project.model_project_project"/>
+            <field name="domain_force">[
+                '&amp;',
+                    ('privacy_visibility', '=', 'portal'),
+                    ('message_partner_ids', 'child_of', [user.partner_id.commercial_partner_id.id]),
+            ]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+        -->
 
-</data>
+        <!--
+        <record id="project_task_rule_portal" model="ir.rule">
+            <field name="name">Project/Task: portal users: (portal and following project) or (portal and following task)</field>
+            <field name="model_id" ref="project.model_project_task"/>
+            <field name="domain_force">[
+            '|',
+                '&amp;',
+                    ('project_id.privacy_visibility', '=', 'portal'),
+                    ('project_id.message_partner_ids', 'child_of', [user.partner_id.commercial_partner_id.id]),
+                '&amp;',
+                    ('project_id.privacy_visibility', '=', 'portal'),
+                    ('message_partner_ids', 'child_of', [user.partner_id.commercial_partner_id.id]),
+            ]</field>
+            <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        </record>
+        -->
+
+        <!-- Proyecto: El Manager puede ver todos los proyectos -->
+        <record model="ir.rule" id="project_project_manager_rule">
+            <field name="name">Project: project manager: see all</field>
+            <field name="model_id" ref="model_project_project"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4,ref('project.group_project_manager'))]"/>
+        </record>        
+
+        <!-- Proyecto -> Tareas: El Manager puede ver todos las tareas asociadas a todos los proyectos -->
+        <record model="ir.rule" id="project_manager_all_project_tasks_rule">
+            <field name="name">Project/Task: project manager: see all</field>
+            <field name="model_id" ref="model_project_task"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4,ref('project.group_project_manager'))]"/>
+        </record>
+
+        <!-- ====================================== Reglas Personalizadas ====================================== -->
+        <!-- Proyecto - Director, Líder, Ingeniero y Gestor -->
+        <record id="project_manager_record_rule" model="ir.rule">
+            <field name="name">Gestionar únicamente sus proyectos</field>
+            <field name="model_id" ref="model_project_project"/>
+            <field name="domain_force">[('user_id','=',user.id)]</field>
+            <field name="domain_force">['|', ('create_uid','=',user.id), ('create_uid','=',False)]</field>
+            <field name="groups" eval="[(4, ref('group_project_director')), (4, ref('group_project_lider')),(4, ref('group_project_ingeniero')), (4, ref('group_project_gestor'))]"/>
+        </record>
+
+        <!-- Requerimiento - Cliente -->
+        <record id="requerimiento_cliente_record_rule" model="ir.rule">
+            <field name="name">Gestionar únicamente sus solicitudes / requerimientos</field>
+            <field name="model_id" ref="model_project_requerimiento"/>
+            <field name="domain_force">['|', ('create_uid','=',user.id), ('create_uid','=',False)]</field>
+            <field name="groups" eval="[(4, ref('group_project_user'))]"/>
+        </record>
+
+        <!-- Requerimiento - Director, Líder, Ingeniero y Gestor -->
+         
+        <record id="requerimiento_proyectos_record_rule" model="ir.rule">
+            <field name="name">Gestionar únicamente las solicitudes / requerimientos asociados a sus proyectos</field>
+            <field name="model_id" ref="model_project_requerimiento"/>
+            <field name="domain_force">['|', ('project_id.create_uid','=',user.id), ('project_id.create_uid','=',False)]</field>
+            <field name="groups" eval="[(4, ref('group_project_director')), (4, ref('group_project_lider')),(4, ref('group_project_ingeniero')), (4, ref('group_project_gestor'))]"/>
+        </record>        
+        
+
+        <!-- Proyecto -> Solicitudes/Requerimientos: El Manager puede ver todas las solicitudes/requerimientos -->
+        <record model="ir.rule" id="project_manager_all_project_solicitudes_requerimientos_rule">
+            <field name="name">Proyecto -> Solicitudes/Requerimientos: gerente del proyecto: ver todo</field>
+            <field name="model_id" ref="model_project_requerimiento"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4,ref('project.group_project_manager'))]"/>
+        </record>                
+
+    </data>
 </odoo>
