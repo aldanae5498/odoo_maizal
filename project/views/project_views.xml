@@ -2,11 +2,18 @@
 <odoo>
 
         <!-- Top menu item -->
+        <!--
         <menuitem name="Project"
             id="menu_main_pm"
             groups="group_project_manager,group_project_user"
             web_icon="project,static/description/icon.png"
             sequence="50"/>
+        -->
+        <menuitem name="Project"
+            id="menu_main_pm"
+            groups="project.group_project_manager,project.group_project_director,project.group_project_lider,project.group_project_ingeniero,project.group_project_gestor,project.group_project_user"
+            web_icon="project,static/description/icon.png"
+            sequence="50"/>        
 
         <menuitem id="menu_project_config" name="Configuration" parent="menu_main_pm"
             sequence="100" groups="project.group_project_manager"/>
@@ -757,6 +764,14 @@
             <field name="view_mode">form</field>
         </record>                
 
+        <!-- Solicitudes (Todas) -->
+        <record id="action_view_solicitudes_todas" model="ir.actions.act_window">
+            <field name="name">Requerimientos</field>
+            <field name="res_model">project.requerimiento</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[(1, '=', 1)]</field>
+        </record>        
+
         <!-- Solicitudes (Radicadas) -->
         <record id="action_view_solicitudes_radicadas" model="ir.actions.act_window">
             <field name="name">Requerimientos</field>
@@ -786,20 +801,23 @@
         </record>
 
         <menuitem name="All Tasks" id="menu_project_management" parent="menu_main_pm"
-            action="action_view_task" sequence="2" groups="base.group_no_one,group_project_user"/>
+            action="action_view_task" sequence="2" groups="project.group_project_manager,project.group_project_director,project.group_project_lider,project.group_project_ingeniero,project.group_project_gestor"/>
 
         <!-- Solicitudes -->
         <menuitem name="Mis Solicitudes" id="menu_project_requerimiento" parent="menu_main_pm"
-            sequence="3" groups="base.group_no_one,group_project_user"/>
+            sequence="3"/>
             <!-- Formulario para Radicar Solicitud (crear Requerimiento) -->
             <menuitem name="Radicar" id="opcion_radicar_solicitud" parent="menu_project_requerimiento"
-            action="action_view_radicar_solicitud" sequence="1"/>
+            action="action_view_radicar_solicitud" sequence="1" groups="project.group_project_manager,project.group_project_user"/>
+            <!-- Todas las Solicitudes -->
+            <menuitem name="Todas" id="opcion_solicitudes_todas" parent="menu_project_requerimiento"
+            action="action_view_solicitudes_todas" sequence="2"/>
             <!-- Solicitudes Radicadas -->
             <menuitem name="Radicadas" id="opcion_solicitudes_radicadas" parent="menu_project_requerimiento"
-            action="action_view_solicitudes_radicadas" sequence="2"/>        
+            action="action_view_solicitudes_radicadas" sequence="3"/>        
             <!-- Solicitudes Aprobadas -->
             <menuitem name="Aprobadas" id="opcion_solicitudes_aprobadas" parent="menu_project_requerimiento"
-            action="action_view_solicitudes_aprobadas" sequence="3"/>                                          
+            action="action_view_solicitudes_aprobadas" sequence="4"/>                              
 
 
         <record id="project_task_action_from_partner" model="ir.actions.act_window">
@@ -956,7 +974,7 @@
 
         <menuitem action="open_task_type_form" id="menu_project_config_project" name="Stages" parent="menu_project_config" sequence="3" groups="base.group_no_one"/>
 
-        <menuitem action="open_view_project_all" id="menu_projects" name="Projects" parent="menu_main_pm" sequence="1"/>
+        <menuitem action="open_view_project_all" id="menu_projects" name="Projects" parent="menu_main_pm" sequence="1" groups="project.group_project_manager,project.group_project_director,project.group_project_lider,project.group_project_ingeniero,project.group_project_gestor"/>
         <menuitem action="open_view_project_all_config" id="menu_projects_config" name="Projects" parent="menu_project_config" sequence="10"/>
 
         <!-- User Form -->
