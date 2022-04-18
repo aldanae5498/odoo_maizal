@@ -99,37 +99,39 @@
                     <button name="btn_send_email" string="Enviar correo" 
                         class="oe_highlight oe_edit_only"
                         type="action"
-                        groups="project.group_project_manager,project.group_project_director"
+                        groups="project.group_project_manager,project.group_project_gestor"
                     />
 
                     <button id="button_confirmar" name="action_radicar" string="Radicar" class="btn-primary" states="borrador"
                         confirm="¿Estás seguro(a) que desea radicar el requerimiento?" 
                         type="object"
-                        groups="project.group_project_manager,project.group_project_director"
+                        groups="project.group_project_manager,project.group_project_gestor"
                     />
 
                     <button id="button_hecho" name="action_aprobar" string="Aprobar" class="btn-primary" states="radicado"
                         confirm="¿Estás seguro(a) que desea aprobar el requerimiento?"
                         type="object"
-                        groups="project.group_project_manager,project.group_project_director"
+                        groups="project.group_project_manager,project.group_project_gestor"
                     />
 
                     <button id="button_borrador" name="action_borrador" string="Establecer a borrador" class="btn-primary" states="cancelado"
                         type="object"
-                        groups="project.group_project_manager,project.group_project_director"
+                        groups="project.group_project_manager,project.group_project_gestor"
                     />
 
                     <button id="button_cancelar" name="action_devolver" string="Devolver" class="btn-primary" states="borrador,aprobado,radicado"
                         confirm="¿Estás seguro(a) que desea devolver el requerimiento?"
                         type="object"
-                        groups="project.group_project_manager,project.group_project_director"
+                        groups="project.group_project_manager,project.group_project_gestor"
                     />                                                                
 
                     <field name="state" widget="statusbar" statusbar_visible="borrador,aprobado,radicado"/>
                 </header>
                 <sheet>                    
                     <div class="oe_button_box">
-                        <button  class="oe_stat_button" name="attachment_tree_view" type="object" icon="fa-files-o">
+                        <button class="oe_stat_button" name="attachment_tree_view" type="object" 
+                            icon="fa-files-o"
+                            groups="project.group_project_manager,project.group_project_gestor">
                             <field string="Documentos" name="doc_count" widget="statinfo"/>
                         </button>
                     </div>                   
@@ -147,16 +149,18 @@
                     
                     <div attrs="{'invisible': [('state','in',('borrador','radicado'))]}">
                         <group>
-                            <field name="project_id"/>
+                            <!-- =========== Asignación de Código: Administrador y Gestor =========== -->
+                            <field name="project_id" groups="project.group_project_manager,project.group_project_gestor"/>
                             <!-- <field name="create_date"/> --> 
                             <field name="fecha_limite"/>
                         </group>
                         <br/>
                         <h2>Interesados:</h2>
                         <group>
-                            <field name="director_id"/>
-                            <field name="lider_id"/>
-                            <field name="gestor_id"/>
+                            <!-- =========== Asignación de responsables: Administrador y Gestor =========== -->
+                            <field name="director_id" groups="project.group_project_manager,project.group_project_gestor"/>
+                            <field name="lider_id" groups="project.group_project_manager,project.group_project_gestor"/>
+                            <field name="gestor_id" groups="project.group_project_manager,project.group_project_gestor"/>
                         </group>                         
                     </div>
                     
@@ -167,18 +171,9 @@
                         </page>
                         <page string="Servicios">
                             <group>
-                                <group>
-                                    <field name="s_tarjeta_debito"/>
-                                    <field name="s_tarjeta_credito"/>
-                                    <field name="s_autorizador"/>
-                                </group>
-                                <group>
-                                    <field name="s_compensacion_redes"/>
-                                    <field name="s_compensacion_bpo"/>
-                                    <field name="s_compensacion_entidades_financieras"/>
-                                </group>                                
+                                <field name="servicio_ids"/>
                             </group>
-                        </page>                                                                                
+                        </page>
                     </notebook>               
                 </sheet>
                 <div class="oe_chatter">
