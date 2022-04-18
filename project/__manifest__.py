@@ -34,6 +34,12 @@
         'views/project_rating_templates.xml',
         # Requerimiento:
         'views/requerimiento.xml',
+        'views/requerimiento_attachment.xml',
+        # Requerimiento / Vistas Heredadas:
+        'views/requerimiento_inherited_views.xml',        
+
+        # Servicio:
+        'views/servicio.xml',
 
         'data/digest_data.xml',
         'data/project_mail_template_data.xml',
