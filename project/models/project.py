@@ -151,9 +151,11 @@ class Project(models.Model):
         # Reload the dashboard
         return action_data
 
+    '''
     def _compute_is_favorite(self):
         for project in self:
             project.is_favorite = self.env.user in project.favorite_user_ids
+    '''
 
     def _inverse_is_favorite(self):
         favorite_projects = not_fav_projects = self.env['project.project'].sudo()
@@ -179,12 +181,18 @@ class Project(models.Model):
     company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.user.company_id)
     currency_id = fields.Many2one('res.currency', related="company_id.currency_id", string="Currency", readonly=True)
 
+    '''
     favorite_user_ids = fields.Many2many(
         'res.users', 'project_favorite_user_rel', 'project_id', 'user_id',
         default=_get_default_favorite_user_ids,
         string='Members')
+    '''
+
+    '''
     is_favorite = fields.Boolean(compute='_compute_is_favorite', inverse='_inverse_is_favorite', string='Show Project on dashboard',
         help="Whether this project should be displayed on the dashboard or not")
+    '''
+
     label_tasks = fields.Char(string='Use Tasks as', default=lambda s: _('Tasks'), translate=True,
         help="Gives label to tasks on project's kanban view.")
     
@@ -245,7 +253,7 @@ class Project(models.Model):
     ], 'Rating Frequency')
 
     portal_show_rating = fields.Boolean('Rating visible publicly', copy=False, oldname='website_published')
-
+    
     _sql_constraints = [
         ('project_date_greater', 'check(date >= date_start)', 'Error! project start-date must be lower than project end-date.')
     ]
