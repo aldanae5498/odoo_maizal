@@ -10,7 +10,8 @@ from odoo.tools.safe_eval import safe_eval
 
 class Requerimiento(models.Model):
     _name = "project.requerimiento"
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ['project.project', 'mail.thread', 'mail.activity.mixin']
+    # _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = "Requerimiento"
     _order = "name"
     _rec_name = "name"
@@ -89,12 +90,16 @@ class Requerimiento(models.Model):
     doc_count = fields.Integer(compute='_compute_attached_docs_count', string="Number of documents attached")
 
     # Servicios:
+    '''
     s_tarjeta_debito = fields.Boolean(string='Tarjeta de Débito', default=False)
     s_tarjeta_credito = fields.Boolean(string='Tarjeta de Crédito', default=False)
     s_autorizador = fields.Boolean(string='Autorizador', default=False)
     s_compensacion_redes = fields.Boolean(string='Compensación Redes', default=False)
     s_compensacion_bpo = fields.Boolean(string='Compensación BPO', default=False)
     s_compensacion_entidades_financieras = fields.Boolean(string='Compensación Entidades Financieras', default=False)
+    '''
+
+    servicio_ids = fields.Many2many('project.servicio', 'project_requerimiento_project_servicio_rel', 'project_requerimiento_id', 'project_servicio_id', string='Servicios')
 
     # Color para el kanban:
     color = fields.Integer(string='Color Index', default=0, compute='change_color_on_kanban')
@@ -115,7 +120,7 @@ class Requerimiento(models.Model):
             record.color = color
 
     def _compute_attached_docs_count(self):
-        Attachment = self.env['ir.attachment']
+        Attachment = self.env['project.requerimiento.attachment']
         for requerimiento in self:
             requerimiento.doc_count = Attachment.search_count([
                 ('res_model', '=', 'project.requerimiento'), ('res_id', '=', requerimiento.id),
@@ -226,7 +231,7 @@ class Requerimiento(models.Model):
     # Vista a documentos:
     @api.multi
     def attachment_tree_view(self):
-        attachment_action = self.env.ref('base.action_attachment')
+        attachment_action = self.env.ref('project.action_requerimiento_attachment')
         action = attachment_action.read()[0]
         action['domain'] = str([
             ('res_model', '=', 'project.requerimiento'),
