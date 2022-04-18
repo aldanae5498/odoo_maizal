@@ -237,7 +237,7 @@
             <field name="arch" type="xml">
                 <search string="Search Project">
                     <field name="name" string="Project Name"/>
-                    <filter string="My Favorites" name="my_projects" domain="[('favorite_user_ids', 'in', uid)]"/>
+                    <!-- <filter string="My Favorites" name="my_projects" domain="[('favorite_user_ids', 'in', uid)]"/> -->
                     <separator/>
                     <filter string="Followed by Me" name="followed_by_me" domain="[('message_is_follower','=',True)]"/>
                     <separator/>
@@ -347,7 +347,7 @@
                     <field name="alias_id"/>
                     <field name="alias_name"/>
                     <field name="alias_domain"/>
-                    <field name="is_favorite"/>
+                    <!-- <field name="is_favorite"/> -->
                     <field name="percentage_satisfaction_project"/>
                     <field name="rating_status"/>
                     <field name="create_uid"/>
@@ -400,7 +400,7 @@
                                         </div>
                                     </div>
                                     <a class="o_kanban_manage_toggle_button o_left" href="#" groups="project.group_project_manager"><i class="fa fa-ellipsis-v" role="img" aria-label="Manage" title="Manage"/></a>
-                                    <span class="o_right"><field name="is_favorite" widget="boolean_favorite" nolabel="1" force_save="1" /></span>
+                                    <!-- <span class="o_right"><field name="is_favorite" widget="boolean_favorite" nolabel="1" force_save="1" /></span> -->
                                 </div>
 
                                 <div class="o_project_kanban_boxes">
@@ -477,6 +477,20 @@
                 </p>
             </field>
         </record>
+
+        <!-- Servicios -->
+        <record id="view_config_servicios" model="ir.actions.act_window">
+            <field name="name">Servicios</field>
+            <field name="res_model">project.servicio</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_empty_folder">
+                    Crea un nuevo servicio
+                </p><p>
+                    Los servicios son items que permiten asociarlos a los requerimientos.
+                </p>
+            </field>
+        </record>        
 
         <!-- Task -->
         <record id="view_task_form2" model="ir.ui.view">
@@ -975,7 +989,9 @@
         <menuitem action="open_task_type_form" id="menu_project_config_project" name="Stages" parent="menu_project_config" sequence="3" groups="base.group_no_one"/>
 
         <menuitem action="open_view_project_all" id="menu_projects" name="Projects" parent="menu_main_pm" sequence="1" groups="project.group_project_manager,project.group_project_director,project.group_project_lider,project.group_project_ingeniero,project.group_project_gestor"/>
+
         <menuitem action="open_view_project_all_config" id="menu_projects_config" name="Projects" parent="menu_project_config" sequence="10"/>
+        <menuitem action="view_config_servicios" id="menu_projects_config_servicios" name="Servicios" parent="menu_project_config" sequence="11"/>
 
         <!-- User Form -->
         <act_window context="{'search_default_user_id': [active_id], 'default_user_id': active_id}"
