@@ -6,3 +6,5 @@ from . import res_config_settings
 from . import res_partner
 from . import digest
 from . import requerimiento
+from . import servicio
+from . import requerimiento_attachment
