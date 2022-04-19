@@ -130,8 +130,7 @@
                 <sheet>                    
                     <div class="oe_button_box">
                         <button class="oe_stat_button" name="attachment_tree_view" type="object" 
-                            icon="fa-files-o"
-                            groups="project.group_project_manager,project.group_project_gestor">
+                            icon="fa-files-o">
                             <field string="Documentos" name="doc_count" widget="statinfo"/>
                         </button>
                     </div>                   
