@@ -41,6 +41,9 @@
         # Servicio:
         'views/servicio.xml',
 
+        # Ciclo de Vida:
+        'views/ciclo_vida.xml',
+
         'data/digest_data.xml',
         'data/project_mail_template_data.xml',
         'data/project_data.xml',
