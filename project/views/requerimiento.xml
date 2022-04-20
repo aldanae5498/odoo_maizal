@@ -8,9 +8,9 @@
             <tree decoration-info="state=='borrador'" decoration-primary="state=='radicado'" decoration-success="state=='aprobado'">           
                 <field name="name"/>
                 <field name="titulo"/>
-                <field name="project_id"/>
                 <field name="create_date" string="Fecha Inicial"/>
-                <field name="fecha_limite"/>
+                <field name="project_id"/>
+                <field name="ciclo_vida_id"/>
                 <field name="state"/>
                 <field name="create_uid" string="Creado por"/>
             </tree>
@@ -26,6 +26,7 @@
                 <field name="name"/>
                 <field name="titulo"/>
                 <field name="project_id"/>
+                <field name="ciclo_vida_id"/>
                 <field name="director_id"/>
                 <field name="lider_id"/>
                 <field name="gestor_id"/>
@@ -42,6 +43,8 @@
                                         <strong>[<field name="name"/>]: </strong><span><field name="titulo"/></span>
                                         <div style="height: 5px;"></div>            
                                         <b>Proyecto: </b> <span><field name="project_id"/></span>
+                                        <div style="height: 5px;"></div>            
+                                        <b>Ciclo de Vida: </b> <span><field name="ciclo_vida_id"/></span>                                        
                                     </div>
                                 </div>
                                 <div class="" style="color: #7C7BAD;margin-top: 10px;font-size: 12px;">
@@ -110,11 +113,13 @@
                         groups="project.group_project_manager,project.group_project_gestor"
                     />
 
+                    <!--
                     <button id="button_hecho" name="action_aprobar" string="Aprobar" class="btn-primary" states="radicado"
                         confirm="¿Estás seguro(a) que desea aprobar el requerimiento?"
                         type="object"
                         groups="project.group_project_manager,project.group_project_gestor"
                     />
+                    -->
 
                     <button id="button_borrador" name="action_borrador" string="Establecer a borrador" class="btn-primary" states="cancelado"
                         type="object"
@@ -148,12 +153,14 @@
                         </h1>
                     </div>
                     
-                    <div attrs="{'invisible': [('state','in',('borrador','radicado'))]}">
+                    <!-- <div attrs="{'invisible': [('state','in',('borrador','radicado'))]}"> -->
+                    <div attrs="{'invisible': [('state', '=', 'borrador')]}">
                         <group>
                             <!-- =========== Asignación de Código: Administrador y Gestor =========== -->
                             <field name="project_id" groups="project.group_project_manager,project.group_project_gestor"/>
-                            <!-- <field name="create_date"/> --> 
-                            <!-- <field name="fecha_limite"/> -->
+                            <field name="ciclo_vida_id" groups="project.group_project_manager,project.group_project_gestor"/>
+                            <field name="fecha_radicacion" attrs="{'invisible': [('state', '=', 'borrador')]}"/> 
+                            <field name="fecha_aprobacion" attrs="{'invisible': [('state','in',('borrador','radicado'))]}"/>
                         </group>
                         <br/>
                         <h2>Interesados:</h2>
