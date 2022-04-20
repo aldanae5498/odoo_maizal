@@ -26,6 +26,15 @@ class Requerimiento(models.Model):
         track_visibility='onchange',
         change_default=True,
     )
+
+    ciclo_vida_id = fields.Many2one(
+        'project.ciclo.vida', 
+        string='Ciclo de Vida', 
+        required=False,
+        track_visibility='onchange',
+        change_default=True,
+    )    
+    
     '''
     project_id = fields.Many2one(
         'project.project', 
@@ -48,6 +57,9 @@ class Requerimiento(models.Model):
         required=False, 
         index=True, 
     )
+
+    fecha_radicacion = fields.Datetime("Fecha de Radicación", required=False, readonly=True)
+    fecha_aprobacion = fields.Datetime("Fecha de Aprobación", required=False, readonly=True)    
 
     state = fields.Selection(
         [
@@ -177,6 +189,26 @@ class Requerimiento(models.Model):
         self.env.user.notify_success(message='¡Requerimiento aprobado exitosamente!')
         self.state = 'aprobado'
 
+    def enviar_correo_aprobacion(self):
+        nombre_cliente = self.create_uid.name
+        correo_cliente = self.create_uid.login
+        name = self.name
+        titulo = self.titulo
+        fecha = datetime.now()
+
+        # Contexto del correo:
+        ctx = {}
+        ctx['nombre_cliente'] = nombre_cliente
+        ctx['email_to'] = correo_cliente
+        ctx['name'] = name
+        ctx['titulo'] = titulo
+        ctx['fecha'] = fecha
+        
+        # Enviar correo:
+        template_id = self.env.ref('project.et_requerimiento_aprobado').id
+        template = self.env['mail.template'].browse(template_id)
+        template.with_context(ctx).send_mail(self.id, force_send=True)
+
     def action_borrador(self):
         self.env.user.notify_success(message='El requerimiento ha sido establecido como borrador')
         self.state = 'borrador'
@@ -276,6 +308,8 @@ class Requerimiento(models.Model):
                 values['director_id'] = ''
                 values['lider_id'] = ''
                 values['gestor_id'] = ''
+            else:
+                values['fecha_radicacion'] = datetime.now()
         else:
             codigo_proyecto = self.env['project.project'].search([('id', '=', project_id)], limit=1).codigo
 
@@ -296,7 +330,18 @@ class Requerimiento(models.Model):
                 if row_count > 0:
                     codigo_requerimiento = self.get_codigo_requerimiento(project_id, codigo_proyecto)
 
+                # Asignando código:
                 values['name'] = codigo_requerimiento
+                
+                # Enviando correo de aprobación:
+                self.enviar_correo_aprobacion()
+                
+                # Mostrando notificación:
+                self.env.user.notify_success(message='¡Requerimiento aprobado exitosamente!')
+                
+                # X el requerimiento:
+                values['state'] = 'aprobado'
+                values['fecha_aprobacion'] = datetime.now()
         
         return super(Requerimiento, self).write(values)
         
