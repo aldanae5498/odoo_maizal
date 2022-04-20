@@ -8,3 +8,4 @@ from . import digest
 from . import requerimiento
 from . import servicio
 from . import requerimiento_attachment
+from . import ciclo_vida
