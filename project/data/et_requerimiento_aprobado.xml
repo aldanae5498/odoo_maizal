@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="et_requerimiento_aprobado" model="mail.template">
+            <field name="name">Email Template - Requerimiento Aprobado</field>
+            <field name="model_id" ref="project.model_project_requerimiento"></field>
+            <field name="email_from">${(object.user_id.email_formatted |safe}</field>
+            <field name="email_to">${ctx['email_to']}</field>
+            <field name="subject">Requerimiento Aprobado: '${ctx['titulo']}'</field>
+            <field name="body_html" type="html">
+                <p>Estimado usuario ${ctx['nombre_cliente']}, sirva el presente correo electrónico para informarle su requerimiento ha sido aprobado.</p>
+                <p>Datos del Requerimiento:</p>
+                <ol>    
+                    <li>Fecha de Aprobación: <strong>${ctx['fecha']}</strong>.</li>
+                    <li>Código: <strong>${ctx['name']}</strong>.</li>
+                    <li>Título: <strong>${ctx['titulo']}</strong>.</li>
+                </ol>
+                <p>Saludos.</p>
+            </field>
+        </record>
+    </data>
+</odoo>
