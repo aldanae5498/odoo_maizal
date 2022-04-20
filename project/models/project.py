@@ -82,7 +82,8 @@ class Project(models.Model):
 
     @api.multi
     def unlink(self):
-        for project in self.with_context(active_test=False):
+        # for project in self.with_context(active_test=False):
+        for project in self:
             if project.tasks:
                 raise UserError(_('You cannot delete a project containing tasks. You can either archive it or first delete all of its tasks.'))
         return super(Project, self).unlink()
@@ -257,6 +258,14 @@ class Project(models.Model):
     _sql_constraints = [
         ('project_date_greater', 'check(date >= date_start)', 'Error! project start-date must be lower than project end-date.')
     ]
+
+    # Mostrar código y nombre del proyecto:
+    def name_get(self):
+        result = []
+        for rec in self:
+            name = '[' + rec.codigo + '] ' + rec.name
+            result.append((rec.id, name))
+        return result     
 
     def _compute_access_url(self):
         super(Project, self)._compute_access_url()
