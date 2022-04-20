@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from curses.ascii import NUL
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from odoo import api, fields, models, tools, SUPERUSER_ID, _
 from odoo.exceptions import UserError, AccessError, ValidationError
@@ -10,7 +10,7 @@ from odoo.tools.safe_eval import safe_eval
 
 class Requerimiento(models.Model):
     _name = "project.requerimiento"
-    _inherit = ['project.project', 'mail.thread', 'mail.activity.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     # _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = "Requerimiento"
     _order = "name"
@@ -23,6 +23,14 @@ class Requerimiento(models.Model):
         'project.project', 
         string='Proyecto', 
         required=False,
+        track_visibility='onchange',
+        change_default=True,
+    )
+    '''
+    project_id = fields.Many2one(
+        'project.project', 
+        string='Proyecto', 
+        required=False,
         states={
             'aprobado': [('required', True)],
         },
@@ -30,17 +38,15 @@ class Requerimiento(models.Model):
         index=True, 
         track_visibility='onchange',
         change_default=True,
-    )
+    )    
+    '''
 
     fecha_inicial = fields.Datetime("Fecha Inicial")
     
     fecha_limite = fields.Datetime(
         "Fecha Límite", 
         required=False, 
-        index=True,
-        states={
-            'aprobado': [('required', True)],
-        }           
+        index=True, 
     )
 
     state = fields.Selection(
@@ -60,27 +66,18 @@ class Requerimiento(models.Model):
         'res.partner', 
         string='Director',
         required=False,
-        states={
-            'aprobado': [('required', True)],
-        }        
     )
 
     lider_id = fields.Many2one(
         'res.partner', 
         string='Líder',
         required=False,
-        states={
-            'aprobado': [('required', True)],
-        }          
     )
 
     gestor_id = fields.Many2one(
         'res.partner', 
         string='Gestor',
         required=False,
-        states={
-            'aprobado': [('required', True)],
-        }          
     ) 
 
     # Descripción:
@@ -126,12 +123,57 @@ class Requerimiento(models.Model):
                 ('res_model', '=', 'project.requerimiento'), ('res_id', '=', requerimiento.id),
             ])    
 
+    @api.multi
+    def unlink(self):
+        for requerimiento in self:
+            if requerimiento.project_id:
+                raise UserError(_('No puede eliminar un requerimiento asociado a un proyecto. Lo puede archivar o establecer el campo de proyecto como vacío.'))
+        return super(Requerimiento, self).unlink()    
+
     # Funciones que cambia el state del requerimiento:
     def action_radicar(self):
-        self.env.user.notify_success(message='¡Requerimiento radicado exitosamente!')
+        nombre_cliente = self.create_uid.name
+        correo_cliente = self.create_uid.login
+        name = self.name
+        titulo = self.titulo
+        fecha = datetime.now()
+
+        # Contexto del correo:
+        ctx = {}
+        ctx['nombre_cliente'] = nombre_cliente
+        ctx['email_to'] = correo_cliente
+        ctx['name'] = name
+        ctx['titulo'] = titulo
+        ctx['fecha'] = fecha
+        
+        # Enviar correo:
+        template_id = self.env.ref('project.et_requerimiento_radicado').id
+        template = self.env['mail.template'].browse(template_id)
+        template.with_context(ctx).send_mail(self.id, force_send=True)
+
+        self.env.user.notify_success(message=f'¡Requerimiento radicado exitosamente!')
         self.state = 'radicado'
 
     def action_aprobar(self):
+        nombre_cliente = self.create_uid.name
+        correo_cliente = self.create_uid.login
+        name = self.name
+        titulo = self.titulo
+        fecha = datetime.now()
+
+        # Contexto del correo:
+        ctx = {}
+        ctx['nombre_cliente'] = nombre_cliente
+        ctx['email_to'] = correo_cliente
+        ctx['name'] = name
+        ctx['titulo'] = titulo
+        ctx['fecha'] = fecha
+        
+        # Enviar correo:
+        template_id = self.env.ref('project.et_requerimiento_aprobado').id
+        template = self.env['mail.template'].browse(template_id)
+        template.with_context(ctx).send_mail(self.id, force_send=True)
+
         self.env.user.notify_success(message='¡Requerimiento aprobado exitosamente!')
         self.state = 'aprobado'
 
@@ -161,6 +203,66 @@ class Requerimiento(models.Model):
         codigo_requerimiento = str(codigo_proyecto) + '-' + str(count_pro_req)
         return codigo_requerimiento
 
+    # ============================ Crear ============================ #
+    '''
+    @api.model
+    def create(self, vals):
+        context = dict(self.env.context, mail_create_nolog=True)
+        res = super(Requerimiento, self.with_context(context)).create(vals)
+
+        if vals:
+            nombre_cliente = self.create_uid.name
+            correo_cliente = self.create_uid.login
+            name = self.name
+            titulo = self.titulo
+            fecha = datetime.now()
+
+            # Contexto del correo:
+            ctx = {}
+            ctx['nombre_cliente'] = nombre_cliente
+            ctx['email_to'] = correo_cliente
+            ctx['name'] = name
+            ctx['titulo'] = titulo
+            ctx['fecha'] = fecha
+
+            # Enviar correo:
+            template_id = self.env.ref('project.et_nuevo_requerimiento').id
+            template = self.env['mail.template'].browse(template_id)
+            template.with_context(ctx).send_mail(self.id, force_send=True)
+
+            self.env.user.notify_success(message='¡Requerimiento creado exitosamente!')
+        
+        return res
+    '''
+
+    '''
+    @api.model
+    def create(self, vals):
+        res = super(Requerimiento, self).create(vals)
+
+        nombre_cliente = self.create_uid.name
+        correo_cliente = self.create_uid.login
+        name = self.name
+        titulo = self.titulo
+        fecha = datetime.now()
+
+        # Contexto del correo:
+        ctx = {}
+        ctx['nombre_cliente'] = nombre_cliente
+        ctx['email_to'] = correo_cliente
+        ctx['name'] = name
+        ctx['titulo'] = titulo
+        ctx['fecha'] = fecha
+
+        # Enviar correo:
+        template_id = self.env.ref('project.et_nuevo_requerimiento').id
+        template = self.env['mail.template'].browse(template_id)
+        template.with_context(ctx).send_mail(self.id, force_send=True)
+
+        return res       
+    '''
+
+    # ============================ Editar ============================ #
     # Secuencia:
     @api.multi
     def write(self, values):
@@ -170,7 +272,7 @@ class Requerimiento(models.Model):
         if state == 'borrador' or state == 'radicado':
             values['name'] = 'Esperando aprobación'
             if state == 'borrador':
-                values['project_id'] = ''
+                values['project_id'] = False
                 values['director_id'] = ''
                 values['lider_id'] = ''
                 values['gestor_id'] = ''
@@ -197,37 +299,7 @@ class Requerimiento(models.Model):
                 values['name'] = codigo_requerimiento
         
         return super(Requerimiento, self).write(values)
-    
-    '''
-    @api.model
-    def create(self, vals):
-        self.env.user.notify_success(message='¡Requerimiento creado exitosamente!')
-        if vals.get('name', _('Nuevo')) == _('Nuevo'):
-            # vals['name'] = self.env['ir.sequence'].next_by_code('project.requerimiento') or _('Nuevo')
-            # vals['name'] = str(vals['project_id']) # ---- Funciona
-            codigo_proyecto = self.env['project.project'].search([('id', '=', vals['project_id'])], limit=1).codigo
-            
-            count_pro_req = self.env['project.requerimiento'].search_count([('project_id', '=', vals['project_id'])])
-            count_pro_req = count_pro_req + 1
-            count_pro_req = str(count_pro_req)
-            if len(count_pro_req) == 1:
-                count_pro_req = '0' + count_pro_req
-
-            # Código del Requerimiento:
-            codigo_requerimiento = self.get_codigo_requerimiento(vals['project_id'], codigo_proyecto)
-
-            # Verificando si existe un requerimiento con éste código:
-            row_count = self.env['project.requerimiento'].search_count([('name', '=', codigo_proyecto)])
-            if row_count > 0:
-                codigo_requerimiento = self.get_codigo_requerimiento(vals['project_id'], codigo_proyecto)
-
-            vals['name'] = codigo_requerimiento
-            # self.env.user.notify_success(message = 'Código del  Proyecto: ' + str(codigo_proyecto))
-        res = super(Requerimiento, self).create(vals)
-        return res
-    '''       
-    
-    
+        
     # Vista a documentos:
     @api.multi
     def attachment_tree_view(self):
@@ -312,22 +384,3 @@ class Requerimiento(models.Model):
             empty_list_help_document_name=tname,
         )
         return super(Requerimiento, self).get_empty_list_help(help)
-
-    '''
-    @api.model
-    def create(self, vals):
-        # context: no_log, because subtype already handle this
-        context = dict(self.env.context, mail_create_nolog=True)
-        # for default stage
-        if vals.get('project_id') and not context.get('default_project_id'):
-            context['default_project_id'] = vals.get('project_id')
-        # user_id change: update date_assign
-        if vals.get('user_id'):
-            vals['date_assign'] = fields.Datetime.now()
-        # Stage change: Update date_end if folded stage and date_last_stage_update
-        if vals.get('stage_id'):
-            vals.update(self.update_date_end(vals['stage_id']))
-            vals['date_last_stage_update'] = fields.Datetime.now()
-        requerimiento = super(Requerimiento, self.with_context(context)).create(vals)
-        return requerimiento         
-    '''           
