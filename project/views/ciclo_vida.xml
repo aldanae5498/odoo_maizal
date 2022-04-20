@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ==================== Listado / Tree ====================  -->
+    <record id="project_ciclo_vida_tree" model="ir.ui.view">
+        <field name="name">project.ciclo.vida.tree</field>
+        <field name="model">project.ciclo.vida</field>
+        <field name="arch" type="xml">
+            <tree>           
+                <field name="nombre"/>
+                <field name="create_uid" string="Creado por"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ==================== Listado / Kanban ====================  -->
+    <record model="ir.ui.view" id="project_ciclo_vida_kanban">
+        <field name="name">project.ciclo.vida.kanban</field>
+        <field name="model">project.ciclo.vida</field>
+        <field name="arch" type="xml">
+            <kanban class="oe_background_grey o_kanban_dashboard o_project_kanban o_emphasize_colors">
+                <field name="nombre"/>
+                <field name="create_uid"/>
+                <templates>
+                <t t-name="kanban-box">
+                    <div class="oe_kanban_global_click o_has_icon">
+                    <!-- <div t-attf-class="oe_kanban_global_click o_has_icon"> -->
+                        <div class="o_project_kanban_main">
+                            <div class="o_kanban_card_content">
+                                <div class="o_kanban_record_top" style="font-size: 15px;"> 
+                                    <div class="o_kanban_record_headings">
+                                        <span><field name="nombre"/></span>
+                                    </div>
+                                </div>
+                            </div>                           
+                        </div>
+                        <div class="o_project_kanban_boxes">
+                            <table style="margin: 10px 0px 0px;">
+                                <tbody>
+                                    <tr>
+                                        <td style="padding-right: 5px;"><span>Creado por:</span></td>
+                                        <td><b><field name="create_uid"/></b></td>
+                                    </tr>
+                                </tbody>
+                            </table>                                                
+                        </div>                          
+                    </div>
+                </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>    
+
+   
+    <!-- ==================== Formulario ==================== -->
+    <record id="project_ciclo_vida_form" model="ir.ui.view">
+        <field name="name">project.ciclo.vida.form</field>
+        <field name="model">project.ciclo.vida</field>
+        <field name="arch" type="xml">
+            <form string="Ciclo de Vida">
+                <sheet>                                         
+                    <div class="oe_title pr-0">
+                        <h1 class="d-flex flex-row justify-content-between">
+                            <field name="nombre" class="o_task_name text-truncate" placeholder="Nombre del Cliclo de Vida..." default_focus="1" />
+                        </h1>
+                    </div>         
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread" options="{'post_refresh': 'recipients'}"/>
+                </div>                
+            </form>
+        </field>
+    </record>      
+
+</odoo>
