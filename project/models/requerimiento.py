@@ -63,13 +63,14 @@ class Requerimiento(models.Model):
 
     state = fields.Selection(
         [
+            ('nuevo', 'Nuevo'),
             ('borrador', 'Borrador'),
             ('radicado', 'Radicado'),
+            ('devuelto', 'Devuelto'),
             ('aprobado', 'Aprobado'),
-            ('cancelado', 'Devuelto'),
         ],
         string = 'Estado',
-        default = 'borrador',
+        default = 'nuevo',
         tracking = True
     )
 
@@ -123,7 +124,7 @@ class Requerimiento(models.Model):
                 color = 11 # Morado
             elif record.state == 'aprobado':
                 color = 10 # Verde
-            else: # cancelado
+            else: # devuelto
                 color = 1 # Rojo
 
             record.color = color
@@ -163,7 +164,7 @@ class Requerimiento(models.Model):
         template = self.env['mail.template'].browse(template_id)
         template.with_context(ctx).send_mail(self.id, force_send=True)
 
-        self.env.user.notify_success(message=f'¡Requerimiento radicado exitosamente!')
+        self.env.user.notify_success(message='¡Requerimiento radicado exitosamente!')
         self.state = 'radicado'
 
     def action_aprobar(self):
@@ -215,8 +216,8 @@ class Requerimiento(models.Model):
 
     def action_devolver(self):
         self.env.user.notify_warning(message='El requerimiento ha sido devuelto')
-        self.state = 'borrador'
-        # self.state = 'cancelado'                        
+        # self.state = 'borrador'
+        self.state = 'devuelto'
 
     '''
     @api.onchange('project_id')
@@ -236,36 +237,11 @@ class Requerimiento(models.Model):
         return codigo_requerimiento
 
     # ============================ Crear ============================ #
-    '''
     @api.model
     def create(self, vals):
-        context = dict(self.env.context, mail_create_nolog=True)
-        res = super(Requerimiento, self.with_context(context)).create(vals)
-
-        if vals:
-            nombre_cliente = self.create_uid.name
-            correo_cliente = self.create_uid.login
-            name = self.name
-            titulo = self.titulo
-            fecha = datetime.now()
-
-            # Contexto del correo:
-            ctx = {}
-            ctx['nombre_cliente'] = nombre_cliente
-            ctx['email_to'] = correo_cliente
-            ctx['name'] = name
-            ctx['titulo'] = titulo
-            ctx['fecha'] = fecha
-
-            # Enviar correo:
-            template_id = self.env.ref('project.et_nuevo_requerimiento').id
-            template = self.env['mail.template'].browse(template_id)
-            template.with_context(ctx).send_mail(self.id, force_send=True)
-
-            self.env.user.notify_success(message='¡Requerimiento creado exitosamente!')
-        
+        vals['state'] = 'borrador'
+        res = super(Requerimiento, self).create(vals)
         return res
-    '''
 
     '''
     @api.model
