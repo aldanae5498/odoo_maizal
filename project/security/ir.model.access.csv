@@ -32,7 +32,7 @@ access_project_servicio_manager,project.servicio.manager,model_project_servicio,
 access_project_servicio_gestor,project.servicio.gestor,model_project_servicio,project.group_project_gestor,1,1,1,0
 access_project_servicio_director,project.servicio.director,model_project_servicio,project.group_project_director,1,1,1,0
 access_project_servicio_lider,project.servicio.lider,model_project_servicio,project.group_project_lider,1,1,1,0
-access_project_servicio_cliente,project.servicio.cliente,model_project_servicio,project.group_project_user,1,1,1,0
+access_project_servicio_cliente,project.servicio.cliente,model_project_servicio,project.group_project_user,1,0,0,0
 access_project_servicio_ingeniero,project.servicio.ingeniero,model_project_servicio,project.group_project_ingeniero,1,1,1,0
 access_project_requerimiento_attachment_manager,project.requerimiento.attachment.manager,model_project_requerimiento_attachment,project.group_project_manager,1,1,1,1
 access_project_requerimiento_attachment_director,project.requerimiento.attachment.director,model_project_requerimiento_attachment,project.group_project_director,1,0,1,0
