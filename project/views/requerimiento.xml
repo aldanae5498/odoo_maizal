@@ -5,7 +5,11 @@
         <field name="name">project.requerimiento.tree</field>
         <field name="model">project.requerimiento</field>
         <field name="arch" type="xml">
-            <tree decoration-info="state=='borrador'" decoration-primary="state=='radicado'" decoration-success="state=='aprobado'">           
+            <tree 
+                decoration-info="state=='borrador'" 
+                decoration-primary="state=='radicado'" 
+                decoration-success="state=='aprobado'"
+                decoration-danger="state=='devuelto'">           
                 <field name="name"/>
                 <field name="titulo"/>
                 <field name="create_date" string="Fecha Inicial"/>
@@ -110,7 +114,7 @@
                     <button id="button_confirmar" name="action_radicar" string="Radicar" class="btn-primary" states="borrador"
                         confirm="¿Estás seguro(a) que desea radicar el requerimiento?" 
                         type="object"
-                        groups="project.group_project_manager,project.group_project_gestor"
+                        groups="project.group_project_manager,project.group_project_gestor,project.group_project_user"
                     />
 
                     <!--
@@ -121,18 +125,18 @@
                     />
                     -->
 
-                    <button id="button_borrador" name="action_borrador" string="Establecer a borrador" class="btn-primary" states="cancelado"
+                    <button id="button_borrador" name="action_borrador" string="Establecer a borrador" class="btn-primary" states="devuelto"
                         type="object"
                         groups="project.group_project_manager,project.group_project_gestor"
                     />
 
-                    <button id="button_cancelar" name="action_devolver" string="Devolver" class="btn-primary" states="borrador,aprobado,radicado"
+                    <button id="button_cancelar" name="action_devolver" string="Devolver" class="btn-primary" states="radicado"
                         confirm="¿Estás seguro(a) que desea devolver el requerimiento?"
                         type="object"
                         groups="project.group_project_manager,project.group_project_gestor"
                     />                                                                
 
-                    <field name="state" widget="statusbar" statusbar_visible="borrador,aprobado,radicado"/>
+                    <field name="state" widget="statusbar" statusbar_visible="nuevo,radicado,devuelto,aprobado"/>
                 </header>
                 <sheet>                    
                     <div class="oe_button_box">
@@ -144,8 +148,8 @@
                     <div class="oe_title">    
                         <h1>
                             <!-- <span>Código</span>: --> 
-                            <field name="name" readonly="1" attrs="{'invisible': [('state','in',('borrador','radicado'))]}" groups="project.group_project_manager,project.group_project_user"/>
-                        </h1>
+                            <field name="name" readonly="1" attrs="{'invisible': [('state','in',('nuevo','borrador','radicado'))]}" groups="project.group_project_manager,project.group_project_user"/>
+                        </h1>                        
                     </div>                
                     <div class="oe_title pr-0">
                         <h1 class="d-flex flex-row justify-content-between">
@@ -153,8 +157,7 @@
                         </h1>
                     </div>
                     
-                    <!-- <div attrs="{'invisible': [('state','in',('borrador','radicado'))]}"> -->
-                    <div attrs="{'invisible': [('state', '=', 'borrador')]}">
+                    <div attrs="{'invisible': [('state','in',('nuevo','borrador'))]}">
                         <group>
                             <!-- =========== Asignación de Código: Administrador y Gestor =========== -->
                             <field name="project_id" groups="project.group_project_manager,project.group_project_gestor"/>
@@ -177,7 +180,7 @@
                             <field name="descripcion" type="html"/>
                             <div class="oe_clear"/>
                         </page>
-                        <page string="Servicios">
+                        <page string="Servicios" groups="project.group_project_manager,project.group_project_gestor">
                             <group>
                                 <field name="servicio_ids"/>
                             </group>
