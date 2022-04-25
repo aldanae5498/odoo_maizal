@@ -4,7 +4,7 @@
         <record id="view_requerimiento_attachment_form" model="ir.ui.view">
             <field name="model">project.requerimiento.attachment</field>
             <field name="arch" type="xml">
-                <form string="Attachments">
+                <form string="Documentos">
                    <sheet>
                     <label for="name" class="oe_edit_only"/>
                     <h1>
@@ -47,7 +47,7 @@
         <record id="view_requerimiento_attachment_tree" model="ir.ui.view">
             <field name="model">project.requerimiento.attachment</field>
             <field name="arch" type="xml">
-                <tree string="Attachments">
+                <tree string="Documentos">
                     <field name="name"/>
                     <field name="datas_fname"/>
                     <field name="res_model"/>
@@ -64,7 +64,7 @@
         <record id="view_requerimiento_attachment_search" model="ir.ui.view">
             <field name="model">project.requerimiento.attachment</field>
             <field name="arch" type="xml">
-                <search string="Attachments">
+                <search string="Documentos">
                     <field name="name" filter_domain="['|', ('name','ilike',self), ('datas_fname','ilike',self)]" string="Attachment"/>
                     <field name="create_date"/>
                     <filter name="my_documents_filter"
@@ -87,7 +87,7 @@
             </field>
         </record>
         <record id="action_requerimiento_attachment" model="ir.actions.act_window">
-            <field name="name">Attachments</field>
+            <field name="name">Documentos</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">project.requerimiento.attachment</field>
             <field name="view_type">form</field>
