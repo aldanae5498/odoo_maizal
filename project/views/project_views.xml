@@ -812,8 +812,15 @@
             <field name="res_model">project.requerimiento</field>
             <field name="view_mode">kanban,tree,form</field>
             <field name="domain">[('state', '=', 'aprobado')]</field>
-        </record>        
+        </record>   
 
+        <!-- Solicitudes (Devueltas) -->
+        <record id="action_view_solicitudes_devueltas" model="ir.actions.act_window">
+            <field name="name">Requerimientos</field>
+            <field name="res_model">project.requerimiento</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('state', '=', 'devuelto')]</field>
+        </record>                
 
         <record id="open_view_task_list_kanban" model="ir.actions.act_window.view">
             <field name="sequence" eval="0"/>
@@ -834,7 +841,7 @@
             sequence="3"/>
             <!-- Formulario para Radicar Solicitud (crear Requerimiento) -->
             <menuitem name="Radicar" id="opcion_radicar_solicitud" parent="menu_project_requerimiento"
-            action="action_view_radicar_solicitud" sequence="1" groups="project.group_project_manager,project.group_project_user"/>
+            action="action_view_solicitudes_todas" sequence="1" groups="project.group_project_manager,project.group_project_user"/>
             <!-- Todas las Solicitudes -->
             <menuitem name="Todas" id="opcion_solicitudes_todas" parent="menu_project_requerimiento"
             action="action_view_solicitudes_todas" sequence="2"/>
@@ -843,7 +850,10 @@
             action="action_view_solicitudes_radicadas" sequence="3"/>        
             <!-- Solicitudes Aprobadas -->
             <menuitem name="Aprobadas" id="opcion_solicitudes_aprobadas" parent="menu_project_requerimiento"
-            action="action_view_solicitudes_aprobadas" sequence="4"/>                              
+            action="action_view_solicitudes_aprobadas" sequence="4"/>
+            <!-- Solicitudes Devueltas -->
+            <menuitem name="Devueltas" id="opcion_solicitudes_devueltas" parent="menu_project_requerimiento"
+            action="action_view_solicitudes_devueltas" sequence="5"/>                                          
 
 
         <record id="project_task_action_from_partner" model="ir.actions.act_window">
