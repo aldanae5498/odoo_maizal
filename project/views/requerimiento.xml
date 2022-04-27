@@ -166,7 +166,7 @@
                             <field name="fecha_aprobacion" attrs="{'invisible': [('state','in',('borrador','radicado'))]}"/>
                         </group>
                         <br/>
-                        <h2>Interesados:</h2>
+                        <h2 groups="project.group_project_manager,project.group_project_gestor">Interesados:</h2>
                         <group>
                             <!-- =========== Asignación de responsables: Administrador y Gestor =========== -->
                             <field name="director_id" groups="project.group_project_manager,project.group_project_gestor"/>
